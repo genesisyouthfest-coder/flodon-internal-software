@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Flodon CRM - Internal Dashboard
 
-## Getting Started
+Professional Sale & Client Management Dashboard for Flodon AI Agency.
 
-First, run the development server:
+## 🚀 Key Modules
+- **Auth**: Secure Supabase Auth with Role-based access.
+- **Sales Dashboard**: Client tracking, pipeline management, and analytics.
+- **Automated Emails**: Integrated with Resend for welcome emails and notifications.
+- **Admin Panel**: Employee management and system-wide audit logs.
+- **Global Notifications**: Real-time activity tracking.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🛠 Tech Stack
+- **Framework**: Next.js 14 (App Router)
+- **Database**: Supabase (PostgreSQL + RLS)
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Icons**: Lucide React
+- **Email**: Resend
+- **Animations**: Framer Motion / Sonner
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ⚙️ Local Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Clone & Install**:
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Environment Variables**:
+   Copy `.env.example` to `.env.local` and fill in your Supabase and Resend credentials.
 
-## Learn More
+3. **Supabase Schema**:
+   Run the SQL provided in `database_schema.sql` in your Supabase SQL Editor to set up tables and RLS policies.
 
-To learn more about Next.js, take a look at the following resources:
+4. **Run Development Server**:
+   ```bash
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔐 Security Protocols
+- **RLS**: Row Level Security is active on all client tables. `added_by` must match current user.
+- **Admin Guard**: Admin routes strictly check for `admin@flodon.in`.
+- **API Security**: Server-side session validation on all routes.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📦 Deployment
+Deploy easily to Vercel:
+1. Push to GitHub.
+2. Link project in Vercel.
+3. Add Environment Variables from your `.env.local`.
+4. Click Deploy.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+© 2026 Flodon.in. All rights reserved.

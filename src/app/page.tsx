@@ -1,100 +1,80 @@
-import Image from "next/image";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="flex flex-col min-h-screen bg-background text-foreground selection:bg-white selection:text-black antialiased">
+      <header className="flex h-20 items-center justify-between px-6 md:px-12 border-b border-border/50">
+        <div className="flex items-center gap-2">
+           <span className="text-xl font-bold tracking-tighter uppercase">Flodon</span>
+        </div>
+        <nav className="flex gap-8">
+           <Link href="/login" className="text-[11px] font-bold hover:text-muted-foreground transition-colors uppercase tracking-[0.1em]">CRM LOGIN</Link>
+        </nav>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <main className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-6xl mx-auto space-y-16 py-32">
+        <div className="space-y-8">
+          <h1 className="text-5xl md:text-[80px] font-extrabold tracking-tighter leading-[0.9] uppercase max-w-[12ch] mx-auto">
+            We automate the work that slows you down.
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-normal">
+            Flodon builds highly precise AI systems that replace repetitive manual 
+            workflows, intelligently convert more leads, and autonomously run your 
+            core business operations while you focus on scaling.
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-6 w-full sm:w-auto">
+           <a 
+             href="https://calendly.com/sanskarkolekarr/flodon" 
+             target="_blank" 
+             rel="noopener noreferrer"
+             className="inline-flex h-14 items-center justify-center bg-primary text-primary-foreground px-10 text-xs font-bold uppercase tracking-[0.1em] rounded-md hover:bg-primary/90 transition-all active:scale-[0.98]"
+           >
+             Book Your Free Call
+           </a>
+           
+           <Link 
+             href="/login"
+             className="inline-flex h-14 items-center justify-center border border-border bg-background px-10 text-xs font-bold uppercase tracking-[0.1em] rounded-md hover:bg-muted transition-all active:scale-[0.98]"
+           >
+             Access CRM
+           </Link>
+        </div>
+
+        <div className="pt-20 space-y-12">
+           <p className="text-[11px] font-bold tracking-[0.2em] text-muted-foreground uppercase">
+             Not a software tool. An execution partner.
+           </p>
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-16 opacity-30 select-none">
+              <div className="space-y-1">
+                <p className="text-2xl font-bold">48hrs</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest">Time to live</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-2xl font-bold">24/7</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest">Autonomous</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-2xl font-bold">$0</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest">Wasted Retainers</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-2xl font-bold">Global</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest">Delivery</p>
+              </div>
+           </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="h-32 flex flex-col items-center justify-center border-t border-border/50 px-6 space-y-4">
+         <p className="text-[10px] font-bold text-muted-foreground tracking-[0.1em] uppercase">
+           AI VOICE AGENTS · AI CHATBOTS · WHATSAPP AUTOMATION · PERSONAL BRANDING · WEBSITE AI · LEAD CONVERSION · 24/7 AUTOMATION
+         </p>
+         <p className="text-[9px] font-medium text-muted-foreground uppercase opacity-50 tracking-widest">
+           © 2025 Flodon · Worldwide · flodon.in
+         </p>
       </footer>
     </div>
   );
