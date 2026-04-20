@@ -13,9 +13,20 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Edit2, Trash2, UserCheck, UserMinus } from 'lucide-react'
 import { format } from 'date-fns'
-import { toggleEmployeeStatus } from '@/app/admin/employees/actions'
+import { toggleEmployeeStatus, deleteEmployee } from '@/app/admin/employees/actions'
 import { toast } from 'sonner'
-import { EditDeptModal } from './EditDeptModal'
+import { EditEmployeeModal } from './EditEmployeeModal'
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 interface EmployeeTableProps {
   employees: any[]
@@ -24,6 +35,8 @@ interface EmployeeTableProps {
 export function EmployeeTable({ employees }: EmployeeTableProps) {
   const [editingEmployee, setEditingEmployee] = useState<any>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [deletingEmployee, setDeletingEmployee] = useState<any>(null)
+  const [deleteOpen, setDeleteOpen] = useState(false)
 
   const handleToggleStatus = async (id: string, currentStatus: boolean) => {
     const result = await toggleEmployeeStatus(id, !currentStatus)
@@ -31,6 +44,17 @@ export function EmployeeTable({ employees }: EmployeeTableProps) {
       toast.success(`Employee ${currentStatus ? 'deactivated' : 'activated'}`)
     } else {
       toast.error(result.error || 'Failed to update status')
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!deletingEmployee) return
+    const result = await deleteEmployee(deletingEmployee.id)
+    if (result.success) {
+      toast.success('Employee deleted completely')
+      setDeleteOpen(false)
+    } else {
+      toast.error(result.error || 'Failed to delete employee')
     }
   }
 
@@ -51,8 +75,8 @@ export function EmployeeTable({ employees }: EmployeeTableProps) {
           </TableHeader>
           <TableBody>
             {employees.map((emp) => (
-              <TableRow key={emp.id} className={!emp.is_active ? 'opacity-50' : ''}>
-                <TableCell className="font-medium">{emp.name}</TableCell>
+              <TableRow key={emp.id}>
+                <TableCell className="font-medium">{emp.full_name}</TableCell>
                 <TableCell>{emp.email}</TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
@@ -74,11 +98,7 @@ export function EmployeeTable({ employees }: EmployeeTableProps) {
                   {format(new Date(emp.created_at), 'MMM d, yyyy')}
                 </TableCell>
                 <TableCell>
-                  {emp.is_active ? (
-                    <Badge className="bg-success text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded transition-all">Active</Badge>
-                  ) : (
-                    <Badge variant="destructive" className="bg-destructive/10 text-destructive border-destructive/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded transition-all">Inactive</Badge>
-                  )}
+                  <Badge className="bg-success text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded transition-all">Active</Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
@@ -95,11 +115,13 @@ export function EmployeeTable({ employees }: EmployeeTableProps) {
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className={emp.is_active ? 'text-destructive hover:text-destructive' : 'text-green-600 hover:text-green-600'}
-                      onClick={() => handleToggleStatus(emp.id, emp.is_active)}
-                      disabled={emp.email === 'admin@flodon.in'}
+                      className="text-destructive hover:bg-destructive/10"
+                      onClick={() => {
+                        setDeletingEmployee(emp)
+                        setDeleteOpen(true)
+                      }}
                     >
-                      {emp.is_active ? <UserMinus className="h-4 w-4" /> : <UserCheck className="h-4 w-4" />}
+                      <UserMinus className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>
@@ -110,12 +132,29 @@ export function EmployeeTable({ employees }: EmployeeTableProps) {
       </div>
 
       {editingEmployee && (
-        <EditDeptModal 
+        <EditEmployeeModal 
           employee={editingEmployee}
           open={modalOpen}
           setOpen={setModalOpen}
         />
       )}
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the employee account ({deletingEmployee?.full_name}) and remove their access to the CRM. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete Account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

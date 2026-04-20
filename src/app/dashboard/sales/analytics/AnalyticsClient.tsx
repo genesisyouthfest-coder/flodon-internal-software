@@ -186,17 +186,18 @@ export default function AnalyticsClient({ initialClients, initialActivity, userI
 
     return (
         <div className="space-y-12 animate-in fade-in duration-500">
-            <div className="flex flex-col gap-6 md:flex-row justify-between items-start md:items-center">
-                <div className="space-y-1">
-                    <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground uppercase">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-border/50">
+                <div className="space-y-2">
+                    <p className="text-[11px] font-bold tracking-[0.2em] text-muted-foreground uppercase">Metrics & performance</p>
+                    <h1 className="text-4xl font-extrabold tracking-tighter uppercase leading-none">
                         Sales Analytics
                     </h1>
-                    <p className="text-muted-foreground">Real-time performance metrics and insights.</p>
+                    <p className="text-muted-foreground text-sm font-medium">Real-time performance metrics and insights.</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="flex items-center gap-2 bg-secondary border border-border rounded-lg px-3 py-1">
                         <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <Select value={dateRange} onValueChange={setDateRange}>
+                        <Select value={dateRange} onValueChange={(val) => setDateRange(val || 'all')}>
                             <SelectTrigger className="w-[140px] border-0 bg-transparent shadow-none focus:ring-0 text-[13px] font-medium">
                                 <SelectValue />
                             </SelectTrigger>
@@ -234,7 +235,7 @@ export default function AnalyticsClient({ initialClients, initialActivity, userI
                             <s.icon className="h-12 w-12" />
                         </div>
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-[11px] font-semibold text-muted-foreground uppercase tracking-[0.05em]">{s.title}</CardTitle>
+                            <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{s.title}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-[32px] font-bold tracking-tight">{s.val}</div>

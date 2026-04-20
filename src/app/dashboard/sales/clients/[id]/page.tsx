@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 
-export default async function ClientDetailPage({ params }: { params: { id: string } }) {
+export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const supabase = await createClient()
 
   const {
@@ -19,8 +20,15 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
   // Fetch client data
   const { data: client } = await supabase
     .from('clients')
-    .select('*')
-    .eq('id', params.id)
+    .select(`
+      *,
+      profiles!clients_added_by_fkey (
+        id,
+        full_name,
+        email
+      )
+    `)
+    .eq('id', id)
     .single()
 
   if (!client) {
@@ -31,7 +39,7 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
   const { data: activities } = await supabase
     .from('activity_log')
     .select('*')
-    .eq('entity_id', params.id)
+    .eq('entity_id', id)
     .order('created_at', { ascending: false })
 
   return (

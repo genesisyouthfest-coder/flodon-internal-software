@@ -42,7 +42,6 @@ export function AddClientModal() {
     const industry = formData.get('industry') as string
 
     try {
-      // 1. Check for duplicate email server-side via Supabase query
       const { data: existing } = await supabase
         .from('clients')
         .select('id')
@@ -51,7 +50,7 @@ export function AddClientModal() {
 
       if (existing) {
         toast.error('Duplicate client error', {
-          description: 'A client with this email already exists in the system.'
+          description: 'A client with this email already exists.'
         })
         setLoading(false)
         return
@@ -66,7 +65,6 @@ export function AddClientModal() {
         .eq('id', user.id)
         .single()
 
-      // 2. Insert client
       const { data: client, error: insertError } = await supabase
         .from('clients')
         .insert({
@@ -85,7 +83,6 @@ export function AddClientModal() {
 
       if (insertError) throw insertError
 
-      // 3. Log activity
       await supabase.from('activity_log').insert({
         user_id: user.id,
         action: 'client_added',
@@ -96,7 +93,6 @@ export function AddClientModal() {
 
       toast.success('Client added successfully')
       
-      // 4. Trigger welcome email (fire and forget or handle error)
       fetch('/api/email/send-welcome', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -111,7 +107,6 @@ export function AddClientModal() {
       }).catch(err => console.error('Failed to trigger welcome email', err))
 
       setOpen(false)
-      // reset form
       ;(e.target as HTMLFormElement).reset()
     } catch (error: any) {
       console.error(error)
@@ -126,51 +121,52 @@ export function AddClientModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" />
+        <Button className="h-11 px-6 text-xs font-bold uppercase tracking-widest rounded-md">
+          <Plus className="mr-2 h-4 w-4" />
           Add Client
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] bg-card border-border/50">
         <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Add New Client</DialogTitle>
-            <DialogDescription>
-              Enter the client details to add them to your pipeline and trigger a welcome email.
+          <DialogHeader className="pb-4">
+            <p className="text-[11px] font-bold tracking-[0.2em] text-muted-foreground uppercase mb-2">New Portfolio Entry</p>
+            <DialogTitle className="text-3xl font-extrabold tracking-tighter uppercase leading-none">Add Client</DialogTitle>
+            <DialogDescription className="text-sm font-medium text-muted-foreground mt-2">
+              Onboard a new lead to your pipeline and trigger automated outreach.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-6 border-y border-border/50">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input id="name" name="name" placeholder="John Doe" required />
+              <div className="space-y-1.5">
+                <Label htmlFor="name" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Full Name</Label>
+                <Input id="name" name="name" placeholder="John Doe" required className="bg-background border-border/50" />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="brand_name">Brand Name</Label>
-                <Input id="brand_name" name="brand_name" placeholder="Acme Inc." />
+              <div className="space-y-1.5">
+                <Label htmlFor="brand_name" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Company Name</Label>
+                <Input id="brand_name" name="brand_name" placeholder="Acme Inc." className="bg-background border-border/50" />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <Input id="email" name="email" type="email" placeholder="john@example.com" required />
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</Label>
+              <Input id="email" name="email" type="email" placeholder="john@example.com" required className="bg-background border-border/50" />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input id="phone" name="phone" placeholder="+1..." />
+              <div className="space-y-1.5">
+                <Label htmlFor="phone" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Phone Number</Label>
+                <Input id="phone" name="phone" placeholder="+1..." className="bg-background border-border/50" />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="industry">Industry</Label>
-                <Input id="industry" name="industry" placeholder="SaaS, E-commerce..." />
+              <div className="space-y-1.5">
+                <Label htmlFor="industry" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Market Industry</Label>
+                <Input id="industry" name="industry" placeholder="SaaS, E-comm..." className="bg-background border-border/50" />
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="service">Requested Service</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="service" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Primary Service</Label>
               <Select name="service" required>
-                <SelectTrigger>
+                <SelectTrigger className="bg-background border-border/50">
                   <SelectValue placeholder="Select a service" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-card border-border/50">
                   <SelectItem value="ai_automation">AI Automation</SelectItem>
                   <SelectItem value="outreach_systems">Outreach Systems</SelectItem>
                   <SelectItem value="sales_closing">Sales Closing</SelectItem>
@@ -179,13 +175,13 @@ export function AddClientModal() {
               </Select>
             </div>
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+          <DialogFooter className="pt-6 gap-3">
+            <Button type="button" variant="ghost" onClick={() => setOpen(false)} className="text-[10px] uppercase font-bold tracking-widest px-6">
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading} className="px-8 text-xs font-bold uppercase tracking-widest">
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Client
+              Onboard Client
             </Button>
           </DialogFooter>
         </form>

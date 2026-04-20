@@ -42,10 +42,13 @@ export async function POST(request: Request) {
     });
 
     // 3. Send via Resend API
+    if (!resend) {
+      return NextResponse.json({ success: false, error: 'Email service not configured. Set RESEND_API_KEY.' }, { status: 503 });
+    }
     const response = await resend.emails.send({
-      from: \`Flodon <\${fromEmail}>\`,
+      from: `Flodon <${fromEmail}>`,
       to: clientEmail,
-      subject: \`Welcome to Flodon, \${clientName} — Let's Build Something Great\`,
+      subject: `Welcome to Flodon, ${clientName} — Let's Build Something Great`,
       html: htmlEmail,
     });
 

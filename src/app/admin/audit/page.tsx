@@ -6,12 +6,12 @@ export default async function AuditLogPage() {
 
   const { data: logs } = await supabase
     .from('activity_log')
-    .select(\`
+    .select(`
       *,
       profiles (
-        name
+        full_name
       )
-    \`)
+    `)
     .order('created_at', { ascending: false })
 
   return (

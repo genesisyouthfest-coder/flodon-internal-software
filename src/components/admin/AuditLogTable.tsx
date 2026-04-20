@@ -26,7 +26,7 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
 
   const filteredLogs = logs.filter(log => {
     const matchesSearch = 
-      log.profiles?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      log.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log.entity_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       JSON.stringify(log.metadata)?.toLowerCase().includes(searchTerm.toLowerCase())
     
@@ -39,22 +39,22 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
     const headers = ['Timestamp', 'Employee', 'Action', 'Entity', 'Details']
     const rows = filteredLogs.map(log => [
       format(new Date(log.created_at), 'yyyy-MM-dd HH:mm:ss'),
-      log.profiles?.name || 'System',
+      log.profiles?.full_name || 'System',
       log.action,
-      \`\${log.entity_type} \${log.entity_id || ''}\`,
+      `${log.entity_type} ${log.entity_id || ''}`,
       JSON.stringify(log.metadata)
     ])
 
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.map(cell => \`"\${String(cell).replace(/"/g, '""')}"\`).join(','))
-    ].join('\\n')
+      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    ].join('\n')
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', \`flodon-audit-log-\${format(new Date(), 'yyyy-MM-dd')}.csv\`)
+    link.setAttribute('download', `flodon-audit-log-${format(new Date(), 'yyyy-MM-dd')}.csv`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
@@ -76,7 +76,7 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Select value={actionFilter} onValueChange={setActionFilter}>
+          <Select value={actionFilter} onValueChange={(val) => setActionFilter(val || 'all')}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Action Type" />
             </SelectTrigger>
@@ -111,7 +111,7 @@ export function AuditLogTable({ logs }: AuditLogTableProps) {
                 <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                   {format(new Date(log.created_at), 'MMM d, HH:mm:ss')}
                 </TableCell>
-                <TableCell className="font-medium">{log.profiles?.name || 'System'}</TableCell>
+                <TableCell className="font-medium">{log.profiles?.full_name || 'System'}</TableCell>
                 <TableCell>
                   <Badge variant="secondary" className="capitalize">
                     {log.action.replace('_', ' ')}

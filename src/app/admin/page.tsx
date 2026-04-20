@@ -49,7 +49,7 @@ export default async function AdminDashboard() {
     .select(`
       *,
       profiles (
-        name
+        full_name
       )
     `)
     .order('created_at', { ascending: false })
@@ -110,7 +110,7 @@ export default async function AdminDashboard() {
                   <div key={log.id} className="grid grid-cols-[1fr_auto] items-center gap-4 py-4 px-4 hover:bg-secondary/50 transition-colors rounded-lg group">
                     <div className="space-y-1">
                       <p className="text-[13px] font-medium leading-none">
-                        <span className="font-bold text-foreground uppercase tracking-tight">{log.profiles?.name || 'System'}</span> 
+                        <span className="font-bold text-foreground uppercase tracking-tight">{log.profiles?.full_name || 'System'}</span> 
                         <span className="text-muted-foreground mx-2 lowercase opacity-60">performed</span>
                         <span className="text-xs font-bold uppercase tracking-widest bg-secondary px-2 py-0.5 rounded text-[10px]">{log.action.replace('_', ' ')}</span>
                       </p>

@@ -13,7 +13,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import { format } from 'date-fns'
+import { cn } from '@/lib/utils'
 import { CheckCircle2, Clock, Search, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -81,43 +83,51 @@ export function ClientsTable({ initialClients }: { initialClients: Client[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search clients, brands, or emails..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
+      <div className="flex flex-col md:flex-row gap-6 items-end justify-between bg-card p-6 rounded-xl border border-border/50 shadow-sm">
+        <div className="space-y-2 w-full md:w-96">
+          <Label className="text-[11px] uppercase font-bold tracking-[0.2em] text-muted-foreground ml-1">Search Database</Label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+            <Input
+              placeholder="Filter by name, brand, or email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 bg-background/50 border-border/50 focus:border-border transition-colors"
+            />
+          </div>
         </div>
-        <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
-          {['all', 'lead', 'contacted', 'proposal', 'closed_won', 'closed_lost'].map((stage) => (
-            <Button
-              key={stage}
-              variant={stageFilter === stage ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setStageFilter(stage)}
-              className="capitalize whitespace-nowrap"
-            >
-              {stage.replace('_', ' ')}
-            </Button>
-          ))}
+        <div className="space-y-2 w-full md:w-auto">
+          <Label className="text-[11px] uppercase font-bold tracking-[0.2em] text-muted-foreground ml-1">Pipeline Filter</Label>
+          <div className="flex gap-1 bg-muted/30 p-1 rounded-lg border border-border/50">
+            {['all', 'lead', 'contacted', 'proposal', 'closed_won', 'closed_lost'].map((stage) => (
+              <Button
+                key={stage}
+                variant={stageFilter === stage ? 'secondary' : 'ghost'}
+                size="sm"
+                onClick={() => setStageFilter(stage)}
+                className={cn(
+                  "capitalize h-8 text-[11px] font-bold tracking-tight rounded-md transition-all",
+                  stageFilter === stage ? "bg-background shadow-sm border border-border/50" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {stage.replace('_', ' ')}
+              </Button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="rounded-md border bg-card">
+      <div className="rounded-xl border border-border/50 bg-card overflow-hidden shadow-sm">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Brand</TableHead>
-              <TableHead>Service</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Pipeline Stage</TableHead>
-              <TableHead>Email Status</TableHead>
-              <TableHead>Date Added</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+          <TableHeader className="bg-muted/50">
+            <TableRow className="hover:bg-transparent border-border/50">
+              <TableHead className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80 py-4">Client Name</TableHead>
+              <TableHead className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80">Corporate Brand</TableHead>
+              <TableHead className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80">Main Service</TableHead>
+              <TableHead className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80">Pipeline</TableHead>
+              <TableHead className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80">Sequence</TableHead>
+              <TableHead className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80">Joined</TableHead>
+              <TableHead className="text-right text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80 pr-6">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -129,44 +139,50 @@ export function ClientsTable({ initialClients }: { initialClients: Client[] }) {
               </TableRow>
             ) : (
               filteredClients.map((client) => (
-                <TableRow key={client.id} className="group">
-                  <TableCell className="font-medium">{client.name}</TableCell>
-                  <TableCell>{client.brand_name || '-'}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{client.service}</Badge>
+                <TableRow key={client.id} className="group border-border/40 hover:bg-secondary/20 transition-colors">
+                  <TableCell className="py-4">
+                    <div className="flex flex-col">
+                      <span className="font-bold tracking-tight text-sm">{client.name}</span>
+                      <span className="text-[10px] text-muted-foreground/60 font-medium">{client.email}</span>
+                    </div>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{client.email}</TableCell>
+                  <TableCell className="text-sm font-medium">{client.brand_name || '-'}</TableCell>
                   <TableCell>
+                    <Badge variant="outline" className="bg-primary/5 text-primary/80 border-primary/20 text-[10px] font-bold tracking-wider px-2 py-0">
+                      {client.service}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-center">
                     <Badge
                       variant={
-                        client.pipeline_stage === 'closed_won' ? 'default' :
-                        client.pipeline_stage === 'closed_lost' ? 'destructive' : 'secondary'
+                         client.pipeline_stage === 'closed_won' ? 'default' :
+                         client.pipeline_stage === 'closed_lost' ? 'destructive' : 'secondary'
                       }
-                      className="capitalize"
+                      className="capitalize text-[10px] font-bold px-2 py-0.5 shadow-none"
                     >
                       {client.pipeline_stage?.replace('_', ' ')}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     {client.email_sent ? (
-                      <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span className="text-xs font-medium">Sent</span>
+                      <div className="flex items-center gap-1.5 text-emerald-500">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Sent</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1.5 text-amber-500">
-                        <Clock className="w-4 h-4" />
-                        <span className="text-xs font-medium">Pending</span>
+                      <div className="flex items-center gap-1.5 text-amber-500 opacity-60">
+                        <Clock className="w-3.5 h-3.5" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Queue</span>
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {format(new Date(client.created_at), 'MMM d, yyyy')}
+                  <TableCell className="text-[11px] font-mono text-muted-foreground/60">
+                    {format(new Date(client.created_at), 'MM/dd/yy')}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" asChild>
+                  <TableCell className="text-right pr-6">
+                    <Button variant="ghost" size="icon" asChild className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg">
                       <Link href={`/dashboard/sales/clients/${client.id}`}>
-                        <ExternalLink className="w-4 h-4" />
+                        <ExternalLink className="w-3.5 h-3.5" />
                       </Link>
                     </Button>
                   </TableCell>

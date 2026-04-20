@@ -7,22 +7,21 @@ export default async function AdminClientsPage() {
   // Fetch all clients with owner profile info
   const { data: clients } = await adminClient
     .from('clients')
-    .select(\`
+    .select(`
       *,
       profiles!clients_added_by_fkey (
         id,
-        name,
+        full_name,
         email
       )
-    \`)
+    `)
     .order('created_at', { ascending: false })
 
   // Fetch all active employees for the reassignment list
   const { data: employees } = await adminClient
     .from('profiles')
-    .select('id, name')
-    .eq('is_active', true)
-    .order('name')
+    .select('id, full_name')
+    .order('full_name')
 
   return (
     <div className="space-y-12">

@@ -6,7 +6,9 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createClient } from '@/utils/supabase/client';
-import { Mail, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { Mail, CheckCircle2, XCircle, Loader2, Send, Shield } from 'lucide-react';
+import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 export default function EmailSettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ export default function EmailSettingsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('email_connections')
         .select('*')
         .eq('user_id', user.id)
@@ -48,14 +50,13 @@ export default function EmailSettingsPage() {
       setLoading(false);
     }
     loadSettings();
-  }, [supabase]);
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // Mask the config for MVP
     const token = btoa(JSON.stringify(smtpConfig));
 
     const { error } = await supabase
@@ -68,9 +69,9 @@ export default function EmailSettingsPage() {
 
     if (!error) {
       setConnection({ provider: 'smtp', access_token: token });
-      alert('Settings saved securely.');
+      toast.success('Connection saved', { description: 'Your SMTP settings have been saved securely.' });
     } else {
-      alert('Failed to save settings: ' + error.message);
+      toast.error('Failed to save', { description: error.message });
     }
     setSaving(false);
   };
@@ -78,70 +79,85 @@ export default function EmailSettingsPage() {
   const handleTest = async () => {
     setTesting(true);
     try {
-      const res = await fetch('/api/email/test', {
-        method: 'POST',
-      });
+      const res = await fetch('/api/email/test', { method: 'POST' });
       const data = await res.json();
       if (data.success) {
-        alert('Test email sent successfully! Please check your inbox.');
+        toast.success('Test email sent', { description: 'Check your inbox for the test message.' });
       } else {
-        alert('Test email failed: ' + data.error);
+        toast.error('Test failed', { description: data.error });
       }
     } catch (error) {
-      alert('Error testing connection.');
+      toast.error('Connection error', { description: 'Unable to reach the email service.' });
     }
     setTesting(false);
   };
 
   if (loading) {
-    return <div className="p-8 flex items-center justify-center"><Loader2 className="animate-spin text-[#6C63FF]" /></div>;
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Loader2 className="animate-spin h-6 w-6 text-muted-foreground" />
+      </div>
+    );
   }
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Email Settings</h1>
-        <p className="text-gray-500">Configure your email sender settings and outgoing SMTP.</p>
+    <div className="space-y-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-border/50">
+        <div className="space-y-2">
+          <p className="text-[11px] font-bold tracking-[0.2em] text-muted-foreground uppercase">Configuration</p>
+          <h1 className="text-4xl font-extrabold tracking-tighter uppercase leading-none">Email Settings</h1>
+          <p className="text-muted-foreground text-sm font-medium">Configure your outgoing email sender via SMTP.</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Status Card */}
         <div className="md:col-span-1 space-y-4">
-          <Card>
+          <Card className="bg-card border-border/50">
             <CardHeader>
-              <CardTitle className="text-lg">Connection Status</CardTitle>
+              <CardTitle className="text-base font-bold">Connection Status</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               {connection ? (
-                <div className="flex items-center space-x-2 text-green-600">
-                  <CheckCircle2 className="w-5 h-5" />
-                  <span className="font-medium">Connected via {connection.provider.toUpperCase()}</span>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className="text-sm font-semibold text-emerald-500">Connected</span>
+                  <Badge variant="secondary" className="text-[10px] uppercase tracking-wider ml-auto">
+                    {connection.provider}
+                  </Badge>
                 </div>
               ) : (
-                <div className="flex items-center space-x-2 text-amber-600">
-                  <XCircle className="w-5 h-5" />
-                  <span className="font-medium">Using Default Feedback</span>
+                <div className="flex items-center gap-2">
+                  <XCircle className="w-4 h-4 text-amber-500" />
+                  <span className="text-sm font-semibold text-amber-500">Not Configured</span>
                 </div>
               )}
 
-              <div className="mt-4 pt-4 border-t text-sm text-gray-600">
-                <p><strong>Currently sending from:</strong></p>
-                <p className="mt-1">
+              <div className="pt-3 border-t border-border/50 space-y-1">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Sending From</p>
+                <p className="text-sm font-medium">
                   {connection && connection.provider === 'smtp' && smtpConfig.user 
                     ? smtpConfig.user 
-                    : 'team@flodon.in (Resend Default)'}
+                    : 'team@flodon.in (Default)'}
                 </p>
+              </div>
+
+              <div className="pt-2 space-y-1">
+                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                  <Shield className="w-3 h-3" />
+                  Password encrypted at rest
+                </div>
               </div>
             </CardContent>
             <CardFooter>
               <Button 
                 variant="outline" 
-                className="w-full text-[#6C63FF] border-[#6C63FF] hover:bg-[#6C63FF] hover:text-white"
+                className="w-full gap-2"
                 onClick={handleTest}
                 disabled={testing}
               >
-                {testing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Mail className="w-4 h-4 mr-2" />}
+                {testing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 Send Test Email
               </Button>
             </CardFooter>
@@ -150,9 +166,9 @@ export default function EmailSettingsPage() {
 
         {/* Configuration Card */}
         <div className="md:col-span-2">
-          <Card>
+          <Card className="bg-card border-border/50">
             <CardHeader>
-              <CardTitle>SMTP Configuration</CardTitle>
+              <CardTitle className="font-bold">SMTP Configuration</CardTitle>
               <CardDescription>
                 Connect your custom email domain or Gmail (App Password required) to send emails directly from your address.
               </CardDescription>
@@ -160,18 +176,18 @@ export default function EmailSettingsPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="host">SMTP Host</Label>
+                  <Label htmlFor="smtp-host">SMTP Host</Label>
                   <Input 
-                    id="host" 
+                    id="smtp-host" 
                     placeholder="smtp.gmail.com" 
                     value={smtpConfig.host}
                     onChange={e => setSmtpConfig({...smtpConfig, host: e.target.value})}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="port">SMTP Port</Label>
+                  <Label htmlFor="smtp-port">SMTP Port</Label>
                   <Input 
-                    id="port" 
+                    id="smtp-port" 
                     placeholder="465"
                     value={smtpConfig.port}
                     onChange={e => setSmtpConfig({...smtpConfig, port: e.target.value})}
@@ -179,9 +195,9 @@ export default function EmailSettingsPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="user">Email Address (User)</Label>
+                <Label htmlFor="smtp-user">Email Address</Label>
                 <Input 
-                  id="user" 
+                  id="smtp-user" 
                   type="email" 
                   placeholder="name@flodon.in"
                   value={smtpConfig.user}
@@ -189,25 +205,31 @@ export default function EmailSettingsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">App Password</Label>
+                <Label htmlFor="smtp-password">App Password</Label>
                 <Input 
-                  id="password" 
+                  id="smtp-password" 
                   type="password" 
                   placeholder="••••••••••••••••"
                   value={smtpConfig.password}
                   onChange={e => setSmtpConfig({...smtpConfig, password: e.target.value})}
                 />
-                <p className="text-xs text-gray-500">Your password will be encrypted before being stored.</p>
+                <p className="text-xs text-muted-foreground">
+                  For Gmail, generate an App Password in your Google Account security settings.
+                </p>
               </div>
             </CardContent>
-            <CardFooter className="flex justify-end space-x-2">
+            <CardFooter className="flex justify-end gap-3">
               <Button 
-                variant="default"
-                className="bg-[#6C63FF] hover:bg-[#5b54d6] text-white"
+                variant="outline"
+                onClick={() => setSmtpConfig({ host: '', port: '', user: '', password: '' })}
+              >
+                Reset
+              </Button>
+              <Button 
                 onClick={handleSave}
                 disabled={saving || !smtpConfig.host || !smtpConfig.user}
               >
-                {saving ? 'Saving...' : 'Save Connection'}
+                {saving ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Saving...</> : 'Save Connection'}
               </Button>
             </CardFooter>
           </Card>
@@ -217,3 +239,4 @@ export default function EmailSettingsPage() {
     </div>
   );
 }
+

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { ArrowRight, Users, Mail, TrendingUp, CheckCircle } from 'lucide-react'
 import { AddClientModal } from '@/components/sales/add-client-modal'
 import { Metadata } from 'next'
+import { cn } from '@/lib/utils'
 
 export const metadata: Metadata = {
   title: 'Sales Dashboard',
@@ -46,96 +47,68 @@ export default async function SalesDashboard() {
   const recentClients = allClients.slice(0, 10)
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Sales Dashboard</h1>
-          <p className="text-muted-foreground">Overview of your sales activity and pipeline.</p>
+    <div className="space-y-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-border/50">
+        <div className="space-y-2">
+          <p className="text-[11px] font-bold tracking-[0.2em] text-muted-foreground uppercase">Revenue & Pipeline</p>
+          <h1 className="text-4xl font-extrabold tracking-tighter uppercase leading-none">Sales Dashboard</h1>
+          <p className="text-muted-foreground text-sm font-medium">Orchestrating growth and pipeline synchronization.</p>
         </div>
-        <div className="w-full sm:w-auto">
-          <AddClientModal />
-        </div>
+        <AddClientModal />
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">My Clients This Month</CardTitle>
-            <Users className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{clientsThisMonth}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Emails Sent</CardTitle>
-            <Mail className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{emailsSent}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Open Leads</CardTitle>
-            <TrendingUp className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{openLeads}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Closed Won</CardTitle>
-            <CheckCircle className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{closedWon}</div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { label: 'Total Clients', sub: 'Current Month', value: clientsThisMonth, icon: Users },
+          { label: 'Emails Delivered', sub: 'System Tracker', value: emailsSent, icon: Mail },
+          { label: 'Open Opportunities', sub: 'Active Pipeline', value: openLeads, icon: TrendingUp },
+          { label: 'Completed Sales', sub: 'Closed Won', value: closedWon, icon: CheckCircle },
+        ].map((stat) => (
+          <Card key={stat.label} className="bg-card border-border/50 hover:border-border transition-colors">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{stat.label}</CardTitle>
+              <stat.icon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold tracking-tighter">{stat.value}</div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Recent Clients */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Recent Clients</CardTitle>
-            <CardDescription>The final 10 clients added by you.</CardDescription>
+      <Card className="bg-card border-border/50">
+        <CardHeader className="pb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg font-bold">Recent Opportunities</CardTitle>
+              <CardDescription className="text-xs uppercase tracking-wider font-semibold opacity-60">Latest leads added to your network</CardDescription>
+            </div>
+            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           </div>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/dashboard/sales/clients">
-              View All <ArrowRight className="ml-2 w-4 h-4" />
-            </Link>
-          </Button>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
+          <div className="rounded-lg border border-border/50 overflow-hidden">
             <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Brand</TableHead>
-                  <TableHead>Service</TableHead>
-                  <TableHead>Stage</TableHead>
-                  <TableHead>Date Added</TableHead>
+              <TableHeader className="bg-muted/50">
+                <TableRow className="hover:bg-transparent border-border/50">
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest">Lead Name</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest">Company</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest">Service</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-center">Stage</TableHead>
+                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-right pr-6">Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {recentClients.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="py-12 text-center">
-                      <div className="flex flex-col items-center justify-center space-y-3">
-                        <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-                          <Users className="h-6 w-6 text-muted-foreground" />
+                    <TableCell colSpan={5} className="py-24 text-center">
+                      <div className="flex flex-col items-center justify-center space-y-6">
+                        <div className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-secondary/50 to-secondary border border-border/50 flex items-center justify-center shadow-inner">
+                          <Users className="h-8 w-8 text-muted-foreground/40" />
                         </div>
-                        <div className="space-y-1">
-                          <p className="font-medium">No clients yet</p>
-                          <p className="text-sm text-muted-foreground">Add your first client to start tracking your pipeline.</p>
+                        <div className="space-y-2 max-w-[280px]">
+                          <p className="text-lg font-bold tracking-tight">Your Pipeline is Quiet</p>
+                          <p className="text-xs text-muted-foreground/60 leading-relaxed">No clients found in your portfolio yet. Add your first client to start tracking metrics and automated outreach.</p>
                         </div>
                         <AddClientModal />
                       </div>
@@ -143,29 +116,31 @@ export default async function SalesDashboard() {
                   </TableRow>
                 ) : (
                   recentClients.map(client => (
-                    <TableRow key={client.id}>
-                      <TableCell className="font-medium">
-                        <Link href={`/dashboard/sales/clients/${client.id}`} className="hover:underline">
+                    <TableRow key={client.id} className="hover:bg-muted/50 border-border/50 transition-colors">
+                      <TableCell className="py-4">
+                        <Link href={`/dashboard/sales/clients/${client.id}`} className="font-bold text-sm tracking-tight hover:underline">
                           {client.name}
                         </Link>
                       </TableCell>
-                      <TableCell>{client.brand_name || '-'}</TableCell>
+                      <TableCell className="text-xs font-semibold text-muted-foreground">{client.brand_name || '-'}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{client.service}</Badge>
+                        <Badge variant="outline" className="text-[10px] font-bold px-2 py-0">
+                          {client.service?.replace('_', ' ')}
+                        </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         <Badge 
                           variant={
                             client.pipeline_stage === 'closed_won' ? 'default' :
                             client.pipeline_stage === 'closed_lost' ? 'destructive' : 'secondary'
                           }
-                          className="capitalize"
+                          className="capitalize text-[10px] font-bold"
                         >
                           {client.pipeline_stage?.replace('_', ' ')}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {format(new Date(client.created_at), 'MMM d, yyyy')}
+                      <TableCell className="text-right text-muted-foreground font-mono text-[11px] pr-6">
+                        {format(new Date(client.created_at), 'MMM d')}
                       </TableCell>
                     </TableRow>
                   ))

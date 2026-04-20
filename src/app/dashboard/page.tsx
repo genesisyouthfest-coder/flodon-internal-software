@@ -22,7 +22,7 @@ export default async function DashboardIndex() {
   const departments = profile?.departments || []
 
   if (departments.length === 1) {
-    redirect(`/dashboard/${departments[0]}`)
+    redirect(`/dashboard/${departments[0].toLowerCase()}`)
   }
 
   if (departments.length === 0) {
@@ -46,7 +46,7 @@ export default async function DashboardIndex() {
       <h1 className="text-3xl font-bold mb-6">Select a Module</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {departments.map((dept: string) => (
-          <Link href={`/dashboard/${dept}`} key={dept}>
+          <Link href={`/dashboard/${dept.toLowerCase()}`} key={dept}>
             <Card className="hover:border-primary transition-colors cursor-pointer capitalize">
               <CardHeader>
                 <div className="flex items-center gap-3">

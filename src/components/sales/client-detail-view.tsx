@@ -20,8 +20,7 @@ import {
   Mail, 
   Phone, 
   Globe, 
-  Instagram, 
-  Facebook, 
+  MessageSquare, 
   Clock, 
   Send,
   Save,
@@ -120,7 +119,14 @@ export function ClientDetailView({ client: initialClient, activities: initialAct
       const res = await fetch('/api/email/send-welcome', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ client }),
+        body: JSON.stringify({
+          clientId: client.id,
+          clientName: client.name,
+          clientEmail: client.email,
+          brandName: client.brand_name,
+          service: client.service,
+          employeeName: client.profiles?.full_name || client.added_by_name || 'Your Account Manager'
+        }),
       })
       
       if (!res.ok) throw new Error('Failed to send email')
@@ -193,7 +199,7 @@ export function ClientDetailView({ client: initialClient, activities: initialAct
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    <Instagram className="w-4 h-4" />
+                    <MessageSquare className="w-4 h-4" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Instagram</p>
@@ -204,7 +210,7 @@ export function ClientDetailView({ client: initialClient, activities: initialAct
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    <Facebook className="w-4 h-4" />
+                    <Globe className="w-4 h-4" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Facebook</p>
@@ -320,7 +326,8 @@ export function ClientDetailView({ client: initialClient, activities: initialAct
                          act.action === 'stage_changed' ? `Stage: ${act.metadata?.new_stage?.replace('_', ' ')}` : 
                          act.action}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground flex items-center">
+                        <MessageSquare className="w-3.5 h-3.5 text-muted-foreground mr-1.5" />
                         {format(new Date(act.created_at), 'MMM d, h:mm a')}
                       </p>
                     </div>

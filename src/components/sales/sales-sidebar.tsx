@@ -2,20 +2,19 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, Activity, Settings, LogOut, Briefcase } from 'lucide-react'
+import { LayoutDashboard, Users, Mail, BarChart3, LogOut, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { logout } from '@/app/logout-action'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { href: '/admin/employees', label: 'Employees', icon: Users, exact: false },
-  { href: '/admin/clients', label: 'Clients', icon: Briefcase, exact: false },
-  { href: '/admin/audit', label: 'Audit Log', icon: Activity, exact: false },
-  { href: '/admin/settings', label: 'Settings', icon: Settings, exact: false },
+  { href: '/dashboard/sales', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+  { href: '/dashboard/sales/clients', label: 'My Clients', icon: Users, exact: false },
+  { href: '/dashboard/sales/email-settings', label: 'Email Settings', icon: Mail, exact: false },
+  { href: '/dashboard/sales/analytics', label: 'Analytics', icon: BarChart3, exact: false },
 ]
 
-export function AdminSidebar() {
+export function SalesSidebar() {
   const pathname = usePathname()
 
   const isActive = (href: string, exact: boolean) => {
@@ -26,7 +25,10 @@ export function AdminSidebar() {
   return (
     <div className="flex h-screen w-72 flex-col bg-card text-foreground selection:bg-white selection:text-black border-r border-border/50">
       <div className="flex h-24 shrink-0 items-center px-8 border-b border-border/50">
-        <span className="text-xl font-black tracking-tighter uppercase leading-none">Flodon <br/> <span className="text-[10px] font-bold tracking-[0.3em] text-muted-foreground">Admin Console</span></span>
+        <span className="text-xl font-black tracking-tighter uppercase leading-none">
+          Flodon <br/> 
+          <span className="text-[10px] font-bold tracking-[0.3em] text-muted-foreground uppercase">Sales Console</span>
+        </span>
       </div>
       
       <div className="flex-1 overflow-auto py-10 px-4 space-y-8">

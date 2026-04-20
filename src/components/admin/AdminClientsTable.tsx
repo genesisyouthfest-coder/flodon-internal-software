@@ -38,7 +38,7 @@ export function AdminClientsTable({ clients, employees }: AdminClientsTableProps
       client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.service?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.profiles?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      client.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
     )
   })
 
@@ -89,7 +89,7 @@ export function AdminClientsTable({ clients, employees }: AdminClientsTableProps
                   <Badge variant="outline">{client.service}</Badge>
                 </TableCell>
                 <TableCell>
-                  <div className="text-sm font-medium">{client.profiles?.name || 'Unknown'}</div>
+                  <div className="text-sm font-medium">{client.profiles?.full_name || 'Unknown'}</div>
                   <div className="text-[10px] text-muted-foreground">{client.profiles?.email}</div>
                 </TableCell>
                 <TableCell>
@@ -113,7 +113,7 @@ export function AdminClientsTable({ clients, employees }: AdminClientsTableProps
                     </SelectTrigger>
                     <SelectContent>
                       {employees.map(emp => (
-                        <SelectItem key={emp.id} value={emp.id}>{emp.name}</SelectItem>
+                        <SelectItem key={emp.id} value={emp.id}>{emp.full_name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
