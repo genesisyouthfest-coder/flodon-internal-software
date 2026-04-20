@@ -93,7 +93,7 @@ export function AddClientModal() {
 
       toast.success('Client added successfully')
       
-      fetch('/api/email/send-welcome', {
+      fetch('/api/email/send-outreach', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -104,7 +104,7 @@ export function AddClientModal() {
           service: service,
           employeeName: profile?.full_name || 'Your Account Manager'
         })
-      }).catch(err => console.error('Failed to trigger welcome email', err))
+      }).catch(err => console.error('Failed to trigger outreach email', err))
 
       setOpen(false)
       ;(e.target as HTMLFormElement).reset()

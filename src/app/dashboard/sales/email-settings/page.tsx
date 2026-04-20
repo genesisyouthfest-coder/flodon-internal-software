@@ -20,7 +20,9 @@ export default function EmailSettingsPage() {
     host: '',
     port: '',
     user: '',
-    password: ''
+    password: '',
+    displayName: 'Flodon CRM',
+    fromEmail: ''
   });
 
   const supabase = createClient();
@@ -79,7 +81,11 @@ export default function EmailSettingsPage() {
   const handleTest = async () => {
     setTesting(true);
     try {
-      const res = await fetch('/api/email/test', { method: 'POST' });
+      const res = await fetch('/api/email/test', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ smtpConfig })
+      });
       const data = await res.json();
       if (data.success) {
         toast.success('Test email sent', { description: 'Check your inbox for the test message.' });
@@ -174,6 +180,27 @@ export default function EmailSettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4 pt-2">
+                <div className="space-y-2">
+                  <Label htmlFor="display-name">Display Name</Label>
+                  <Input 
+                    id="display-name" 
+                    placeholder="Flodon CRM" 
+                    value={smtpConfig.displayName}
+                    onChange={e => setSmtpConfig({...smtpConfig, displayName: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="from-email">Sender Email (Alias)</Label>
+                  <Input 
+                    id="from-email" 
+                    placeholder="coo@flodon.in"
+                    value={smtpConfig.fromEmail}
+                    onChange={e => setSmtpConfig({...smtpConfig, fromEmail: e.target.value})}
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="smtp-host">SMTP Host</Label>
@@ -221,7 +248,7 @@ export default function EmailSettingsPage() {
             <CardFooter className="flex justify-end gap-3">
               <Button 
                 variant="outline"
-                onClick={() => setSmtpConfig({ host: '', port: '', user: '', password: '' })}
+                onClick={() => setSmtpConfig({ host: '', port: '', user: '', password: '', displayName: 'Flodon CRM', fromEmail: '' })}
               >
                 Reset
               </Button>

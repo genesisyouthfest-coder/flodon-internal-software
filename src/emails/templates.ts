@@ -104,7 +104,7 @@ const getSteps = () => `
 const templates: Record<string, (props: TemplateProps) => string> = {
   'AI Automation': ({ clientName, brandName, employeeName }) => baseLayout(`
     <p>Hi ${clientName},</p>
-    <p>Welcome to Flodon. We're thrilled to connect with ${brandName || 'your team'}.</p>
+    <p>I'm reaching out from Flodon AI to connect with ${brandName || 'your team'}.</p>
     <p>We'll automate your repetitive workflows using custom AI agents, saving your team 20+ hours per week. By eliminating manual bottlenecks, your team can focus on what actually drives revenue.</p>
     ${getSteps()}
     <a href="#" class="cta-button">Book Your Free Strategy Call</a>
@@ -113,7 +113,7 @@ const templates: Record<string, (props: TemplateProps) => string> = {
 
   'Lead Generation': ({ clientName, brandName, employeeName }) => baseLayout(`
     <p>Hi ${clientName},</p>
-    <p>Welcome to Flodon. We're thrilled to connect with ${brandName || 'your team'}.</p>
+    <p>I'm reaching out from Flodon AI to connect with ${brandName || 'your team'}.</p>
     <p>We'll build you a predictable pipeline of qualified leads using data-driven outreach systems. Stop stressing about where your next client is coming from and start scaling with confidence.</p>
     ${getSteps()}
     <a href="#" class="cta-button">Book Your Free Strategy Call</a>
@@ -122,7 +122,7 @@ const templates: Record<string, (props: TemplateProps) => string> = {
 
   'Content Marketing': ({ clientName, brandName, employeeName }) => baseLayout(`
     <p>Hi ${clientName},</p>
-    <p>Welcome to Flodon. We're thrilled to connect with ${brandName || 'your team'}.</p>
+    <p>I'm reaching out from Flodon AI to connect with ${brandName || 'your team'}.</p>
     <p>We'll create content that positions your brand as the authority in your industry. Through strategic storytelling and SEO-driven insights, we turn your brand into a magnet for your ideal customers.</p>
     ${getSteps()}
     <a href="#" class="cta-button">Book Your Free Strategy Call</a>
@@ -131,7 +131,7 @@ const templates: Record<string, (props: TemplateProps) => string> = {
 
   'Social Media Management': ({ clientName, brandName, employeeName }) => baseLayout(`
     <p>Hi ${clientName},</p>
-    <p>Welcome to Flodon. We're thrilled to connect with ${brandName || 'your team'}.</p>
+    <p>I'm reaching out from Flodon AI to connect with ${brandName || 'your team'}.</p>
     <p>We'll grow your brand's social presence with consistent, high-quality content that converts. Let us handle the creative heavy lifting while you focus on closing the inbound attention.</p>
     ${getSteps()}
     <a href="#" class="cta-button">Book Your Free Strategy Call</a>
@@ -140,7 +140,7 @@ const templates: Record<string, (props: TemplateProps) => string> = {
 
   'Paid Ads': ({ clientName, brandName, employeeName }) => baseLayout(`
     <p>Hi ${clientName},</p>
-    <p>Welcome to Flodon. We're thrilled to connect with ${brandName || 'your team'}.</p>
+    <p>I'm reaching out from Flodon AI to connect with ${brandName || 'your team'}.</p>
     <p>We'll run laser-targeted ad campaigns that turn your ad spend into measurable revenue. Using algorithmic bidding and advanced split-testing, we ensure your brand gets maximum ROI on every dollar.</p>
     ${getSteps()}
     <a href="#" class="cta-button">Book Your Free Strategy Call</a>
@@ -149,7 +149,7 @@ const templates: Record<string, (props: TemplateProps) => string> = {
 
   'SEO': ({ clientName, brandName, employeeName }) => baseLayout(`
     <p>Hi ${clientName},</p>
-    <p>Welcome to Flodon. We're thrilled to connect with ${brandName || 'your team'}.</p>
+    <p>I'm reaching out from Flodon AI to connect with ${brandName || 'your team'}.</p>
     <p>We'll get your brand ranking on Google for the searches your ideal customers are already making. It’s time to capture high-intent traffic and build a moat around your digital presence.</p>
     ${getSteps()}
     <a href="#" class="cta-button">Book Your Free Strategy Call</a>
@@ -158,7 +158,7 @@ const templates: Record<string, (props: TemplateProps) => string> = {
 
   'Web Development': ({ clientName, brandName, employeeName }) => baseLayout(`
     <p>Hi ${clientName},</p>
-    <p>Welcome to Flodon. We're thrilled to connect with ${brandName || 'your team'}.</p>
+    <p>I'm reaching out from Flodon AI to connect with ${brandName || 'your team'}.</p>
     <p>We'll build a high-converting, blazing-fast website that works as your best salesperson. We merge modern design aesthetics with conversion-rate-optimization principles to craft digital experiences that sell.</p>
     ${getSteps()}
     <a href="#" class="cta-button">Book Your Free Strategy Call</a>
@@ -167,7 +167,7 @@ const templates: Record<string, (props: TemplateProps) => string> = {
 
   'Other': ({ clientName, brandName, employeeName }) => baseLayout(`
     <p>Hi ${clientName},</p>
-    <p>Welcome to Flodon. We're thrilled to connect with ${brandName || 'your team'}.</p>
+    <p>I'm reaching out from Flodon AI to connect with ${brandName || 'your team'}.</p>
     <p>We'll help your business achieve intelligent growth with our modern, data-driven solutions. Let's work together to streamline operations and scale your revenue efficiently.</p>
     ${getSteps()}
     <a href="#" class="cta-button">Book Your Free Strategy Call</a>

@@ -125,7 +125,7 @@ export function ClientsTable({ initialClients }: { initialClients: Client[] }) {
               <TableHead className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80">Corporate Brand</TableHead>
               <TableHead className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80">Main Service</TableHead>
               <TableHead className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80">Pipeline</TableHead>
-              <TableHead className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80">Sequence</TableHead>
+              <TableHead className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80">Outreach</TableHead>
               <TableHead className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80">Joined</TableHead>
               <TableHead className="text-right text-[10px] uppercase font-bold tracking-widest text-muted-foreground/80 pr-6">Actions</TableHead>
             </TableRow>

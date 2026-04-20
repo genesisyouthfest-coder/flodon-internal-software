@@ -75,4 +75,18 @@ CREATE POLICY "Users can manage their own clients"
 ON clients FOR ALL
 USING ( auth.uid() = added_by OR (auth.jwt() ->> 'email') = 'admin@flodon.in' );
 
+-- activity_log: users can view and insert their own logs
+CREATE POLICY "Users can view own activity logs"
+ON activity_log FOR SELECT
+USING ( auth.uid() = user_id OR (auth.jwt() ->> 'email') = 'admin@flodon.in' );
+
+CREATE POLICY "Users can insert own activity logs"
+ON activity_log FOR INSERT
+WITH CHECK ( auth.uid() = user_id );
+
+-- email_connections: users can manage their own connection
+CREATE POLICY "Users can manage own email connection"
+ON email_connections FOR ALL
+USING ( auth.uid() = user_id OR (auth.jwt() ->> 'email') = 'admin@flodon.in' );
+
 -- Admins bypass all RLS via service role key by default for server-side functions.
