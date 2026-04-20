@@ -34,7 +34,7 @@ export default async function DepartmentPage({
     redirect(`/dashboard/sales`);
   }
 
-  if (!departments.map(d => d.toLowerCase()).includes(deptLower)) {
+  if (!departments.map((d: string) => d.toLowerCase()).includes(deptLower)) {
     redirect('/dashboard');
   }
 

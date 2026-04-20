@@ -6,86 +6,56 @@ export interface TemplateProps {
 
 const baseLayout = (content: string) => `
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: 'Inter', sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue";
-      background-color: #FFFFFF;
-      color: #0A0A0A;
-      margin: 0;
-      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 16px;
       line-height: 1.6;
+      color: #1a1a1a;
+      margin: 0;
+      padding: 20px;
     }
-    .container {
+    .wrapper {
       max-width: 600px;
       margin: 0 auto;
-      padding: 40px 20px;
     }
-    .logo {
-      font-size: 24px;
-      font-weight: 800;
+    .link-button {
       color: #6C63FF;
-      margin-bottom: 40px;
-      letter-spacing: -0.5px;
-    }
-    .content {
-      font-size: 16px;
-      color: #333333;
-    }
-    .cta-button {
-      display: inline-block;
-      background-color: #6C63FF;
-      color: #FFFFFF;
-      padding: 14px 28px;
-      border-radius: 6px;
-      text-decoration: none;
+      text-decoration: underline;
       font-weight: 600;
-      margin: 30px 0;
-      text-align: center;
     }
     .footer {
-      margin-top: 50px;
-      padding-top: 30px;
-      border-top: 1px solid #EAEAEA;
-      font-size: 12px;
-      color: #888888;
-      text-align: center;
+      margin-top: 40px;
+      font-size: 13px;
+      color: #71717a;
     }
-    .tagline {
-      font-style: italic;
-      color: #666;
-      margin-bottom: 10px;
-    }
-    .unsubscribe {
-      color: #888888;
-      text-decoration: underline;
-    }
-    ul {
-      padding-left: 20px;
-    }
-    li {
-      margin-bottom: 10px;
+    .logo-text {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      margin-bottom: 30px;
+      color: #000;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="logo">
-      <!-- To be replaced with /public/logo.png later -->
-      FLODON
-    </div>
+  <div class="wrapper">
+    <div class="logo-text">FLODON</div>
     
     <div class="content">
       ${content}
     </div>
 
     <div class="footer">
-      <div class="tagline">Intelligent Growth for Modern Brands</div>
-      <p>© ${new Date().getFullYear()} Flodon AI Agency. All rights reserved.</p>
-      <p>If you no longer wish to receive these emails, you can <a href="#" class="unsubscribe">unsubscribe here</a>.</p>
+      <p>—<br/>
+      <strong>Flodon AI Agency</strong><br/>
+      <span style="font-size: 11px; color: #a1a1aa;">Intelligent Growth for Modern Brands</span></p>
+      <p style="font-size: 11px; margin-top: 20px;">
+        <a href="#" style="color: #a1a1aa; text-decoration: underline;">Unsubscribe</a> from these updates
+      </p>
     </div>
   </div>
 </body>
@@ -134,7 +104,7 @@ const templates: Record<string, (props: TemplateProps) => string> = {
     <p>I'm reaching out from Flodon AI to connect with ${brandName || 'your team'}.</p>
     <p>We'll grow your brand's social presence with consistent, high-quality content that converts. Let us handle the creative heavy lifting while you focus on closing the inbound attention.</p>
     ${getSteps()}
-    <a href="#" class="cta-button">Book Your Free Strategy Call</a>
+    <a href="#" class="link-button">Book Your Free Strategy Call</a>
     <p>Best regards,<br/>${employeeName}<br/>Flodon Team</p>
   `),
 
@@ -143,7 +113,7 @@ const templates: Record<string, (props: TemplateProps) => string> = {
     <p>I'm reaching out from Flodon AI to connect with ${brandName || 'your team'}.</p>
     <p>We'll run laser-targeted ad campaigns that turn your ad spend into measurable revenue. Using algorithmic bidding and advanced split-testing, we ensure your brand gets maximum ROI on every dollar.</p>
     ${getSteps()}
-    <a href="#" class="cta-button">Book Your Free Strategy Call</a>
+    <a href="#" class="link-button">Book Your Free Strategy Call</a>
     <p>Best regards,<br/>${employeeName}<br/>Flodon Team</p>
   `),
 
@@ -152,7 +122,7 @@ const templates: Record<string, (props: TemplateProps) => string> = {
     <p>I'm reaching out from Flodon AI to connect with ${brandName || 'your team'}.</p>
     <p>We'll get your brand ranking on Google for the searches your ideal customers are already making. It’s time to capture high-intent traffic and build a moat around your digital presence.</p>
     ${getSteps()}
-    <a href="#" class="cta-button">Book Your Free Strategy Call</a>
+    <a href="#" class="link-button">Book Your Free Strategy Call</a>
     <p>Best regards,<br/>${employeeName}<br/>Flodon Team</p>
   `),
 
@@ -161,7 +131,7 @@ const templates: Record<string, (props: TemplateProps) => string> = {
     <p>I'm reaching out from Flodon AI to connect with ${brandName || 'your team'}.</p>
     <p>We'll build a high-converting, blazing-fast website that works as your best salesperson. We merge modern design aesthetics with conversion-rate-optimization principles to craft digital experiences that sell.</p>
     ${getSteps()}
-    <a href="#" class="cta-button">Book Your Free Strategy Call</a>
+    <a href="#" class="link-button">Book Your Free Strategy Call</a>
     <p>Best regards,<br/>${employeeName}<br/>Flodon Team</p>
   `),
 
@@ -170,7 +140,7 @@ const templates: Record<string, (props: TemplateProps) => string> = {
     <p>I'm reaching out from Flodon AI to connect with ${brandName || 'your team'}.</p>
     <p>We'll help your business achieve intelligent growth with our modern, data-driven solutions. Let's work together to streamline operations and scale your revenue efficiently.</p>
     ${getSteps()}
-    <a href="#" class="cta-button">Book Your Free Strategy Call</a>
+    <a href="#" class="link-button">Book Your Free Strategy Call</a>
     <p>Best regards,<br/>${employeeName}<br/>Flodon Team</p>
   `)
 };
