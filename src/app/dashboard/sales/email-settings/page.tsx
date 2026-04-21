@@ -16,13 +16,12 @@ export default function EmailSettingsPage() {
   const [testing, setTesting] = useState(false);
   const [connection, setConnection] = useState<any>(null);
   
-  const [smtpConfig, setSmtpConfig] = useState({
+  const [smtpConfig, setSmtpConfig] = useState<any>({
     host: '',
     port: '',
     user: '',
     password: '',
-    displayName: 'Flodon CRM',
-    fromEmail: ''
+    displayName: 'Flodon CRM'
   });
 
   const supabase = createClient();
@@ -180,7 +179,7 @@ export default function EmailSettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 pt-2">
+              <div className="grid grid-cols-1 gap-4 pt-2">
                 <div className="space-y-2">
                   <Label htmlFor="display-name">Display Name</Label>
                   <Input 
@@ -188,15 +187,6 @@ export default function EmailSettingsPage() {
                     placeholder="Flodon CRM" 
                     value={smtpConfig.displayName}
                     onChange={e => setSmtpConfig({...smtpConfig, displayName: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="from-email">Sender Email (Alias)</Label>
-                  <Input 
-                    id="from-email" 
-                    placeholder="coo@flodon.in"
-                    value={smtpConfig.fromEmail}
-                    onChange={e => setSmtpConfig({...smtpConfig, fromEmail: e.target.value})}
                   />
                 </div>
               </div>
@@ -248,7 +238,7 @@ export default function EmailSettingsPage() {
             <CardFooter className="flex justify-end gap-3">
               <Button 
                 variant="outline"
-                onClick={() => setSmtpConfig({ host: '', port: '', user: '', password: '', displayName: 'Flodon CRM', fromEmail: '' })}
+                onClick={() => setSmtpConfig({ host: '', port: '', user: '', password: '', displayName: 'Flodon CRM' })}
               >
                 Reset
               </Button>

@@ -6,7 +6,6 @@ interface EmailOptions {
   subject: string;
   html: string;
   fromName?: string;
-  fromEmail?: string;
 }
 
 export async function sendEmail(
@@ -38,11 +37,11 @@ export async function sendEmail(
     });
 
     const info = await transporter.sendMail({
-      from: `"${options.fromName || 'Flodon'}" <${options.fromEmail || smtpConfig.user}>`,
+      from: `"${options.fromName || 'Flodon'}" <${smtpConfig.user}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,
-      replyTo: options.fromEmail || smtpConfig.user,
+      replyTo: smtpConfig.user,
     });
 
     return { success: true, messageId: info.messageId };

@@ -38,7 +38,6 @@ export async function POST(request: Request) {
       to: toEmail,
       subject: 'Flodon CRM - Test Connection Successful',
       fromName: smtpConfig?.displayName || 'Flodon CRM',
-      fromEmail: smtpConfig?.fromEmail || smtpConfig?.user,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e5e5; border-radius: 8px; overflow: hidden;">
           <div style="background-color: #000000; padding: 24px; text-align: center; border-bottom: 1px solid #333;">
@@ -50,7 +49,6 @@ export async function POST(request: Request) {
             <p style="font-size: 16px; line-height: 1.5; color: #888888;">You can now use these settings to send automated welcome emails and notifications to your clients directly from your account.</p>
             <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #333;">
                <p style="font-size: 12px; color: #444; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;">Sent via ${smtpConfig ? `SMTP (${smtpConfig.user})` : 'Resend Default'}</p>
-               ${smtpConfig?.fromEmail ? `<p style="font-size: 11px; color: #444; margin-top: 4px;">Displayed to client as: ${smtpConfig.fromEmail}</p>` : ''}
             </div>
           </div>
         </div>

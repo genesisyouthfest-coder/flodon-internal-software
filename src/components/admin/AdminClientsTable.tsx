@@ -23,6 +23,7 @@ import {
 import { reassignClient } from '@/app/admin/clients/actions'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
+import { getServiceLabel } from '@/lib/constants'
 
 interface AdminClientsTableProps {
   clients: any[]
@@ -83,10 +84,11 @@ export function AdminClientsTable({ clients, employees }: AdminClientsTableProps
               <TableRow key={client.id}>
                 <TableCell>
                   <div className="font-medium">{client.name}</div>
+                  <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">{client.role || '-'}</div>
                   <div className="text-xs text-muted-foreground">{client.email}</div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline">{client.service}</Badge>
+                  <Badge variant="outline">{getServiceLabel(client.service)}</Badge>
                 </TableCell>
                 <TableCell>
                   <div className="text-sm font-medium">{client.profiles?.full_name || 'Unknown'}</div>

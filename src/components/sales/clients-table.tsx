@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils'
 import { CheckCircle2, Clock, Search, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { getServiceLabel } from '@/lib/constants'
 
 interface Client {
   id: string
@@ -149,7 +150,7 @@ export function ClientsTable({ initialClients }: { initialClients: Client[] }) {
                   <TableCell className="text-sm font-medium">{client.brand_name || '-'}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="bg-primary/5 text-primary/80 border-primary/20 text-[10px] font-bold tracking-wider px-2 py-0">
-                      {client.service}
+                      {getServiceLabel(client.service)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-center">

@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { createClient } from '@/utils/supabase/client'
+import { FLODON_SERVICES } from '@/lib/constants'
 
 export function AddClientModal() {
   const [open, setOpen] = useState(false)
@@ -40,6 +41,9 @@ export function AddClientModal() {
     const service = formData.get('service') as string
     const phone = formData.get('phone') as string
     const industry = formData.get('industry') as string
+    const role = formData.get('role') as string
+    const lead_source = formData.get('lead_source') as string
+    const source_link = formData.get('source_link') as string
 
     try {
       const { data: existing } = await supabase
@@ -76,7 +80,10 @@ export function AddClientModal() {
           industry,
           added_by: user.id,
           added_by_name: profile?.full_name || user.email,
-          pipeline_stage: 'lead'
+          pipeline_stage: 'lead',
+          role,
+          lead_source,
+          source_link
         })
         .select()
         .single()
@@ -102,6 +109,10 @@ export function AddClientModal() {
           clientEmail: email,
           brandName: brand_name,
           service: service,
+          role: role,
+          industry: industry,
+          leadSource: lead_source,
+          sourceLink: source_link,
           employeeName: profile?.full_name || 'Your Account Manager'
         })
       }).catch(err => console.error('Failed to trigger outreach email', err))
@@ -146,9 +157,15 @@ export function AddClientModal() {
                 <Input id="brand_name" name="brand_name" placeholder="Acme Inc." className="bg-background border-border/50" />
               </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</Label>
-              <Input id="email" name="email" type="email" placeholder="john@example.com" required className="bg-background border-border/50" />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Email Address</Label>
+                <Input id="email" name="email" type="email" placeholder="john@example.com" required className="bg-background border-border/50" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="role" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Recipient Role</Label>
+                <Input id="role" name="role" placeholder="CEO, Founder..." className="bg-background border-border/50" />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
@@ -160,6 +177,16 @@ export function AddClientModal() {
                 <Input id="industry" name="industry" placeholder="SaaS, E-comm..." className="bg-background border-border/50" />
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="lead_source" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Lead Source</Label>
+                <Input id="lead_source" name="lead_source" placeholder="LinkedIn, Instagram..." className="bg-background border-border/50" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="source_link" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Source Link</Label>
+                <Input id="source_link" name="source_link" placeholder="https://..." className="bg-background border-border/50" />
+              </div>
+            </div>
             <div className="space-y-1.5">
               <Label htmlFor="service" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Primary Service</Label>
               <Select name="service" required>
@@ -167,10 +194,11 @@ export function AddClientModal() {
                   <SelectValue placeholder="Select a service" />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border/50">
-                  <SelectItem value="ai_automation">AI Automation</SelectItem>
-                  <SelectItem value="outreach_systems">Outreach Systems</SelectItem>
-                  <SelectItem value="sales_closing">Sales Closing</SelectItem>
-                  <SelectItem value="content_strategy">Content Strategy</SelectItem>
+                  {FLODON_SERVICES.map((service) => (
+                    <SelectItem key={service.id} value={service.id}>
+                      {service.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

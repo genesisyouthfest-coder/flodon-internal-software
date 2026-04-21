@@ -15,13 +15,13 @@ import {
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
-import { 
-  Building2, 
-  Mail, 
-  Phone, 
-  Globe, 
-  MessageSquare, 
-  Clock, 
+import {
+  Building2,
+  Mail,
+  Phone,
+  Globe,
+  MessageSquare,
+  Clock,
   Send,
   Save,
   Loader2,
@@ -29,6 +29,7 @@ import {
 } from 'lucide-react'
 import debounce from 'lodash.debounce'
 import { useRouter } from 'next/navigation'
+import { getServiceLabel } from '@/lib/constants'
 
 interface ClientDetailViewProps {
   client: any
@@ -73,7 +74,7 @@ export function ClientDetailView({ client: initialClient, activities: initialAct
 
       setClient({ ...client, pipeline_stage: newStage })
       toast.success(`Stage updated to ${newStage.replace('_', ' ')}`)
-      
+
       // Refresh activities
       const { data: newActivities } = await supabase
         .from('activity_log')
@@ -125,12 +126,14 @@ export function ClientDetailView({ client: initialClient, activities: initialAct
           clientEmail: client.email,
           brandName: client.brand_name,
           service: client.service,
+          role: client.role,
+          industry: client.industry,
           employeeName: client.profiles?.full_name || client.added_by_name || 'Your Account Manager'
         }),
       })
-      
+
       if (!res.ok) throw new Error('Failed to send email')
-      
+
       toast.success('Onboarding email resent successfully')
     } catch (error: any) {
       toast.error(error.message || 'Failed to send email')
@@ -153,7 +156,7 @@ export function ClientDetailView({ client: initialClient, activities: initialAct
               </CardDescription>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <Badge 
+              <Badge
                 variant={client.email_sent ? "default" : "secondary"}
                 className={client.email_sent ? "bg-green-500 hover:bg-green-600" : ""}
               >
@@ -225,7 +228,7 @@ export function ClientDetailView({ client: initialClient, activities: initialAct
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Service Needed</p>
-                    <p className="text-sm font-medium">{client.service}</p>
+                    <p className="text-sm font-medium">{getServiceLabel(client.service)}</p>
                   </div>
                 </div>
               </div>
@@ -288,9 +291,9 @@ export function ClientDetailView({ client: initialClient, activities: initialAct
             </Select>
 
             {client.email_sent && (
-              <Button 
-                variant="outline" 
-                className="w-full gap-2" 
+              <Button
+                variant="outline"
+                className="w-full gap-2"
                 onClick={handleResendEmail}
                 disabled={resendingEmail}
               >
@@ -319,12 +322,12 @@ export function ClientDetailView({ client: initialClient, activities: initialAct
                     )}
                     {/* Timeline Dot */}
                     <div className="absolute left-[10px] top-[18px] w-3 h-3 rounded-full bg-primary border-2 border-background z-10" />
-                    
+
                     <div className="space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        {act.action === 'client_added' ? 'Client onboarded' : 
-                         act.action === 'stage_changed' ? `Stage: ${act.metadata?.new_stage?.replace('_', ' ')}` : 
-                         act.action}
+                        {act.action === 'client_added' ? 'Client onboarded' :
+                          act.action === 'stage_changed' ? `Stage: ${act.metadata?.new_stage?.replace('_', ' ')}` :
+                            act.action}
                       </p>
                       <p className="text-xs text-muted-foreground flex items-center">
                         <MessageSquare className="w-3.5 h-3.5 text-muted-foreground mr-1.5" />

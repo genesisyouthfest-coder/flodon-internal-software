@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { sendEmail } from '@/lib/mail';
-import { getEmailTemplate } from '@/emails/templates';
+import { generateOutreachEmail } from '@/lib/gemini';
+import { FLODON_SERVICES } from '@/lib/constants';
+import fs from 'fs';
+import path from 'path';
 
 export async function POST(request: Request) {
   try {
@@ -35,20 +38,43 @@ export async function POST(request: Request) {
       }
     }
 
-    // 2. Look up correct HTML template based on service
-    const htmlEmail = getEmailTemplate(service, {
-      clientName,
-      brandName,
-      employeeName,
+    // 2. Look up service description
+    const serviceInfo = FLODON_SERVICES.find(s => s.id === service) || {
+      label: service,
+      description: 'AI automation services for business growth'
+    };
+
+    // 3. Read the Generator Prompt
+    let promptTemplate = "";
+    try {
+      const promptPath = path.join(process.cwd(), '..', 'Resources', 'Email_GeneratorPrompt.txt');
+      promptTemplate = fs.readFileSync(promptPath, 'utf8');
+    } catch (e) {
+      console.warn("Could not read Email_GeneratorPrompt.txt, using fallback logic");
+      promptTemplate = "Generate a short, direct outreach email for {{NAME}} regarding {{SERVICE_NAME}}.";
+    }
+
+    // 4. Generate email via Gemini
+    const { subject, body: emailBody } = await generateOutreachEmail({
+      recipientName: clientName,
+      recipientRole: body.role || 'Business Owner', // Support optional role
+      businessName: brandName,
+      industry: body.industry || 'your industry',
+      serviceName: serviceInfo.label,
+      serviceDescription: serviceInfo.description,
+      promptTemplate: promptTemplate
     });
 
-    // 3. Send email via our utility
+    // 5. Send email via our utility
     const response = await sendEmail({
       to: clientEmail,
-      subject: `Introduction: Flodon AI Agency — Strategic Growth for ${brandName || clientName}`,
+      subject: subject,
       fromName: smtpConfig?.displayName || 'Flodon CRM',
-      fromEmail: smtpConfig?.fromEmail || smtpConfig?.user,
-      html: htmlEmail,
+      html: `
+        <div style="font-family: 'Inter', sans-serif; color: #0a0a0a; white-space: pre-wrap; line-height: 1.6; font-size: 16px;">
+${emailBody}
+        </div>
+      `,
     }, smtpConfig);
 
     // 4. On success: update clients table
