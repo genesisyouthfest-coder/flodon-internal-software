@@ -19,18 +19,20 @@ export async function login(formData: FormData) {
   }
 
   const user = authData.user
-
+ 
   if (user) {
-    if (user.email === 'admin@flodon.in') {
-      redirect('/admin')
-    }
-
-    // Fetch profile to check departments
+    // Fetch profile to check departments and admin status
     const { data: profile } = await supabase
       .from('profiles')
-      .select('departments')
+      .select('departments, is_admin')
       .eq('id', user.id)
       .single()
+
+    const isAdmin = profile?.is_admin || user.email === 'admin@flodon.in'
+
+    if (isAdmin) {
+      redirect('/admin')
+    }
 
     const departments = profile?.departments || []
 
@@ -44,4 +46,10 @@ export async function login(formData: FormData) {
   }
 
   return { error: 'Unknown error occurred' }
+}
+export async function logout() {
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  revalidatePath('/', 'layout')
+  redirect('/login')
 }

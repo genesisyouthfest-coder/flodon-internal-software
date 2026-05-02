@@ -1,62 +1,139 @@
 import { createClient } from '@/utils/supabase/server'
-import { notFound, redirect } from 'next/navigation'
-import { ClientDetailView } from '@/components/sales/client-detail-view'
-import { Button } from '@/components/ui/button'
-import { ChevronLeft } from 'lucide-react'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { updateClientStage } from '../actions'
+import NotesEditor from './NotesEditor'
+import DeleteClientButton from './DeleteClientButton'
 
-export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+export default async function ClientDetailPage(props: {
+  params: Promise<{ id: string }>
+}) {
+  const params = await props.params
   const supabase = await createClient()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
-
-  // Fetch client data
   const { data: client } = await supabase
     .from('clients')
-    .select(`
-      *,
-      profiles!clients_added_by_fkey (
-        id,
-        full_name,
-        email
-      )
-    `)
-    .eq('id', id)
+    .select('*')
+    .eq('id', params.id)
     .single()
 
-  if (!client) {
-    notFound()
-  }
-
-  // Fetch activities for this client
-  const { data: activities } = await supabase
-    .from('activity_log')
-    .select('*')
-    .eq('entity_id', id)
-    .order('created_at', { ascending: false })
+  if (!client) notFound()
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild className="rounded-full">
-          <Link href="/dashboard/sales/clients">
-            <ChevronLeft className="w-5 h-5" />
+    <div className="space-y-12 animate-in fade-in duration-700">
+      {/* Header */}
+      <div className="flex flex-col gap-6 pb-6 border-b-2 border-foreground">
+        <div className="flex items-center gap-4">
+          <Link href="/dashboard/sales/clients" className="text-sm font-bold uppercase tracking-widest hover:underline">
+            &larr; Back to Directory
           </Link>
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Client Details</h1>
-          <p className="text-sm text-muted-foreground">Detailed view and management for {client.name}.</p>
+          <div className="h-1 w-1 bg-foreground rounded-full" />
+          <p className="text-xs font-bold tracking-widest text-foreground/60 uppercase">Record ID: {client.id.slice(0, 8)}</p>
+        </div>
+        
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-2">
+            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter leading-none">{client.name}</h1>
+            <p className="text-xl font-bold tracking-widest text-foreground/80 uppercase mt-2">{client.brand_name || 'Individual Entity'}</p>
+          </div>
+          
+          <div className="flex flex-col items-start md:items-end gap-2 w-full md:w-auto">
+             <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Status Alignment</p>
+             <div className="inline-flex items-center gap-2 border-2 border-foreground p-2 overflow-x-auto max-w-full no-scrollbar whitespace-nowrap">
+                {['lead', 'contacted', 'demo', 'proposal', 'negotiation', 'won', 'lost'].map((stage) => (
+                  <form key={stage} action={async () => {
+                    'use server'
+                    await updateClientStage(client.id, stage)
+                  }}>
+                    <button 
+                      type="submit"
+                      className={`px-3 py-1 text-[10px] font-black uppercase tracking-[0.1em] transition-colors border-2 ${client.pipeline_stage === stage ? 'bg-foreground text-background border-foreground' : 'border-transparent hover:border-foreground/30'}`}
+                    >
+                      {stage}
+                    </button>
+                  </form>
+                ))}
+             </div>
+          </div>
         </div>
       </div>
 
-      <ClientDetailView client={client} activities={activities || []} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        {/* Left Column: Intelligence */}
+        <div className="lg:col-span-2 space-y-12">
+          <NotesEditor clientId={client.id} initialNotes={client.notes} />
+
+          <section className="space-y-6">
+             <h2 className="text-sm font-black uppercase tracking-[0.2em] border-b-2 border-foreground pb-2">Entity Metadata</h2>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                {[
+                  ['Industry', client.industry],
+                  ['Service Module', client.service],
+                  ['Role/Persona', client.role],
+                  ['Country of Origin', client.country]
+                ].map(([label, value]) => (
+                  <div key={label} className="space-y-1 border-l-2 border-foreground pl-4">
+                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">{label}</p>
+                    <p className="text-sm font-bold uppercase tracking-tight">{value || 'N/A'}</p>
+                  </div>
+                ))}
+             </div>
+          </section>
+        </div>
+
+        {/* Right Column: Connection Hub */}
+        <div className="space-y-12">
+            <section className="space-y-6">
+               <h2 className="text-sm font-black uppercase tracking-[0.2em] border-b-2 border-foreground pb-2">Connect</h2>
+               <div className="space-y-4">
+                  <div className="card-solid p-6 space-y-4">
+                     <div className="space-y-1">
+                       <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Direct Email</p>
+                       <p className="text-sm font-bold">{client.email}</p>
+                     </div>
+                     {client.phone && (
+                       <div className="space-y-1">
+                         <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Phone</p>
+                         <p className="text-sm font-bold">{client.phone}</p>
+                       </div>
+                     )}
+                  </div>
+
+                  <div className="flex gap-4">
+                    {client.ig_profile && (
+                      <a href={client.ig_profile} target="_blank" className="btn-outline flex-1 text-center py-2 text-xs">Instagram</a>
+                    )}
+                    {client.fb_profile && (
+                      <a href={client.fb_profile} target="_blank" className="btn-outline flex-1 text-center py-2 text-xs">Facebook</a>
+                    )}
+                  </div>
+               </div>
+            </section>
+
+            <section className="space-y-6">
+               <h2 className="text-sm font-black uppercase tracking-[0.2em] border-b-2 border-foreground pb-2">Engagement Status</h2>
+               <div className="card-solid p-6 flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                     <p className="text-[10px] font-bold uppercase tracking-widest opacity-50">Email Sent</p>
+                     <span className={`h-2 w-2 rounded-full ${client.email_sent ? 'bg-green-500' : 'bg-red-500'}`} />
+                  </div>
+                  {client.email_sent_at && (
+                     <p className="text-xs font-bold uppercase tracking-tighter opacity-70">
+                        Dispatched: {new Date(client.email_sent_at).toLocaleDateString()}
+                     </p>
+                  )}
+               </div>
+            </section>
+
+            <section className="space-y-6 pt-12 border-t-2 border-foreground/10">
+               <h2 className="text-sm font-black uppercase tracking-[0.2em] text-red-500">System Destruction</h2>
+               <div className="card-solid p-6 border-red-500/30">
+                  <p className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-4 italic">Permanent record deletion cannot be reversed.</p>
+                  <DeleteClientButton clientId={client.id} />
+               </div>
+            </section>
+        </div>
+      </div>
     </div>
   )
 }

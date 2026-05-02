@@ -143,7 +143,7 @@ export const templates: Record<string, { subject: string, body: (props: Template
 
   'ai_personal_branding': {
     subject: 'Leveraging visibility for {{BRAND}}',
-    body: ({ clientName, brandName, employeeName }) => baseLayout(`
+    body: ({ clientName, employeeName }) => baseLayout(`
       <p>Hi ${clientName},</p>
       <p>Most business owners are competent but invisible. In today's market, brand is the only long-term leverage.</p>
       <p>We turn one 30-minute conversation with you into 20+ precise pieces of content that dominate your niche. We've bridged the gap between having expertise and having an authority presence, so you can focus on building while the AI handles the distribution.</p>

@@ -1,155 +1,123 @@
 import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { format } from 'date-fns'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { ArrowRight, Users, Mail, TrendingUp, CheckCircle } from 'lucide-react'
-import { AddClientModal } from '@/components/sales/add-client-modal'
-import { Metadata } from 'next'
-import { cn } from '@/lib/utils'
 
-export const metadata: Metadata = {
-  title: 'Sales Dashboard',
-}
-
-export default async function SalesDashboard() {
+export default async function SalesOverviewPage() {
   const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    redirect('/login')
-  }
-
-  // Get current user's clients
-  const { data: clients } = await supabase
-    .from('clients')
-    .select('*')
-    .eq('added_by', user.id)
-    .order('created_at', { ascending: false })
-
-  const allClients = clients || []
   
-  // Calculate stats
-  const now = new Date()
-  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+  const { data: { user } } = await supabase.auth.getUser()
   
-  const clientsThisMonth = allClients.filter(c => new Date(c.created_at) >= currentMonthStart).length
-  const emailsSent = allClients.filter(c => c.email_sent).length
-  const openLeads = allClients.filter(c => ['lead', 'contacted', 'proposal'].includes(c.pipeline_stage)).length
-  const closedWon = allClients.filter(c => c.pipeline_stage === 'closed_won').length
+  // Parallelize fetch quick stats and active tasks for the agent
+  const [clientResponse, leadResponse, taskResponse] = await Promise.all([
+    supabase
+      .from('clients')
+      .select('*', { count: 'exact', head: true })
+      .eq('added_by', user?.id),
+    supabase
+      .from('clients')
+      .select('*', { count: 'exact', head: true })
+      .eq('added_by', user?.id)
+      .eq('pipeline_stage', 'lead'),
+    supabase
+      .from('tasks')
+      .select('*, assigned_by_profile:profiles!tasks_assigned_by_fkey(full_name)')
+      .eq('agent_id', user?.id)
+      .neq('status', 'completed')
+      .order('created_at', { ascending: false })
+  ])
 
-  const recentClients = allClients.slice(0, 10)
+  const totalClients = clientResponse.count || 0
+  const leads = leadResponse.count || 0
+  const tasks = taskResponse.data || []
 
   return (
-    <div className="space-y-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-border/50">
-        <div className="space-y-2">
-          <p className="text-[11px] font-bold tracking-[0.2em] text-muted-foreground uppercase">Revenue & Pipeline</p>
-          <h1 className="text-4xl font-extrabold tracking-tighter uppercase leading-none">Sales Dashboard</h1>
-          <p className="text-muted-foreground text-sm font-medium">Orchestrating growth and pipeline synchronization.</p>
-        </div>
-        <AddClientModal />
+    <div className="space-y-12 animate-in fade-in duration-700 pb-20">
+      <div className="space-y-2 pb-6 border-b-2 border-foreground">
+        <p className="text-xs font-bold tracking-widest text-foreground/60 uppercase">Operations Hub</p>
+        <h1 className="text-4xl font-extrabold tracking-tight uppercase">Sales Command Center</h1>
+        <p className="text-sm font-semibold tracking-widest text-foreground/80 mt-2">Departmental Intelligence & Performance.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: 'Total Clients', sub: 'Current Month', value: clientsThisMonth, icon: Users },
-          { label: 'Emails Delivered', sub: 'System Tracker', value: emailsSent, icon: Mail },
-          { label: 'Open Opportunities', sub: 'Active Pipeline', value: openLeads, icon: TrendingUp },
-          { label: 'Completed Sales', sub: 'Closed Won', value: closedWon, icon: CheckCircle },
+          { label: 'Total Entities', value: totalClients || 0, sub: 'Active Records' },
+          { label: 'Unprocessed Leads', value: leads || 0, sub: 'Immediate Action' },
+          { label: 'Active Tasks', value: tasks?.length || 0, sub: 'Strategic Objectives' },
         ].map((stat) => (
-          <Card key={stat.label} className="bg-card border-border/50 hover:border-border transition-colors">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{stat.label}</CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold tracking-tighter">{stat.value}</div>
-            </CardContent>
-          </Card>
+          <div key={stat.label} className="card-solid p-6 md:p-8 space-y-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">{stat.label}</p>
+            <p className="text-3xl md:text-5xl font-black">{stat.value}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 pt-2">{stat.sub}</p>
+          </div>
         ))}
       </div>
 
-      <Card className="bg-card border-border/50">
-        <CardHeader className="pb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-lg font-bold">Recent Opportunities</CardTitle>
-              <CardDescription className="text-xs uppercase tracking-wider font-semibold opacity-60">Latest leads added to your network</CardDescription>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 pt-6">
+         {/* Task Queue */}
+         <section className="space-y-6">
+            <div className="flex items-center justify-between border-b-2 border-foreground pb-2">
+               <h2 className="text-sm font-black uppercase tracking-[0.2em]">Task Force Queue</h2>
+               <span className="text-[10px] font-black bg-foreground text-background px-2 py-0.5">Priority: Active</span>
             </div>
-            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-lg border border-border/50 overflow-hidden">
-            <Table>
-              <TableHeader className="bg-muted/50">
-                <TableRow className="hover:bg-transparent border-border/50">
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest">Lead Name</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest">Company</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest">Service</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-center">Stage</TableHead>
-                  <TableHead className="text-[10px] font-bold uppercase tracking-widest text-right pr-6">Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentClients.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} className="py-24 text-center">
-                      <div className="flex flex-col items-center justify-center space-y-6">
-                        <div className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-secondary/50 to-secondary border border-border/50 flex items-center justify-center shadow-inner">
-                          <Users className="h-8 w-8 text-muted-foreground/40" />
-                        </div>
-                        <div className="space-y-2 max-w-[280px]">
-                          <p className="text-lg font-bold tracking-tight">Your Pipeline is Quiet</p>
-                          <p className="text-xs text-muted-foreground/60 leading-relaxed">No clients found in your portfolio yet. Add your first client to start tracking metrics and automated outreach.</p>
-                        </div>
-                        <AddClientModal />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  recentClients.map(client => (
-                    <TableRow key={client.id} className="hover:bg-muted/50 border-border/50 transition-colors">
-                      <TableCell className="py-4">
-                        <Link href={`/dashboard/sales/clients/${client.id}`} className="font-bold text-sm tracking-tight hover:underline">
-                          {client.name}
-                        </Link>
-                      </TableCell>
-                      <TableCell className="text-xs font-semibold text-muted-foreground">{client.brand_name || '-'}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-[10px] font-bold px-2 py-0">
-                          {client.service?.replace('_', ' ')}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge 
-                          variant={
-                            client.pipeline_stage === 'closed_won' ? 'default' :
-                            client.pipeline_stage === 'closed_lost' ? 'destructive' : 'secondary'
-                          }
-                          className="capitalize text-[10px] font-bold"
-                        >
-                          {client.pipeline_stage?.replace('_', ' ')}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right text-muted-foreground font-mono text-[11px] pr-6">
-                        {format(new Date(client.created_at), 'MMM d')}
-                      </TableCell>
-                    </TableRow>
+            <div className="space-y-4">
+               {tasks && tasks.length > 0 ? (
+                  tasks.map((task: any) => (
+                    <div key={task.id} className="card-solid p-6 space-y-4 border-l-8 border-l-foreground">
+                       <div className="flex justify-between items-start">
+                          <div className="space-y-1">
+                             <p className="text-xs font-black uppercase tracking-tight">{task.title}</p>
+                             <p className="text-[10px] font-medium opacity-60 leading-relaxed italic">{task.description}</p>
+                             {task.deadline && (
+                                <p className="text-[9px] font-black uppercase tracking-widest text-red-500 pt-1">
+                                   Due: {new Date(task.deadline).toLocaleDateString()}
+                                </p>
+                             )}
+                          </div>
+                          <p className="text-[9px] font-black uppercase opacity-40">From: {task.assigned_by_profile?.full_name || 'Admin'}</p>
+                       </div>
+                       <div className="flex gap-2 pt-2">
+                          <form action={async () => {
+                             'use server'
+                             const { updateTaskStatus } = await import('../../admin/sales/actions')
+                             await updateTaskStatus(task.id, 'completed')
+                          }}>
+                             <button type="submit" className="text-[9px] font-black uppercase tracking-widest border-2 border-foreground px-4 py-1.5 hover:bg-foreground hover:text-background transition-colors">
+                                Mark Completed
+                             </button>
+                          </form>
+                       </div>
+                    </div>
                   ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+               ) : (
+                  <div className="p-12 border-2 border-dashed border-foreground/30 flex flex-col items-center justify-center text-center space-y-2">
+                     <p className="text-[10px] font-black uppercase tracking-widest opacity-40">No pending objectives</p>
+                     <p className="text-[9px] font-medium italic opacity-30 italic">Strategic silence detected.</p>
+                  </div>
+               )}
+            </div>
+         </section>
+
+         {/* Workflows */}
+         <section className="space-y-6">
+            <h2 className="text-sm font-black uppercase tracking-[0.2em] border-b-2 border-foreground pb-2">Primary Workflows</h2>
+            <div className="grid grid-cols-1 gap-4">
+               <Link href="/dashboard/sales/clients" className="flex items-center justify-between p-6 border-2 border-foreground hover:bg-foreground hover:text-background transition-colors group">
+                  <div className="space-y-1">
+                     <p className="text-lg font-bold uppercase tracking-tight">Client Directory</p>
+                     <p className="text-[10px] font-medium opacity-60">Manage your persona database.</p>
+                  </div>
+                  <span className="text-xl group-hover:translate-x-2 transition-transform">&rarr;</span>
+               </Link>
+               
+               <Link href="/dashboard/sales/clients/add" className="flex items-center justify-between p-6 border-2 border-foreground hover:bg-foreground hover:text-background transition-colors group">
+                  <div className="space-y-1">
+                     <p className="text-lg font-bold uppercase tracking-tight">Onboard New Entity</p>
+                     <p className="text-[10px] font-medium opacity-60">Initialize client records.</p>
+                  </div>
+                  <span className="text-xl group-hover:translate-x-2 transition-transform">&rarr;</span>
+               </Link>
+            </div>
+         </section>
+      </div>
     </div>
   )
 }

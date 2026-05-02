@@ -50,7 +50,7 @@ export async function generateOutreachEmail(variables: {
       const errorJson = JSON.parse(errorBody);
       errorMessage = errorJson.error?.message || errorMessage;
       console.error("Gemini API Error Detail:", JSON.stringify(errorJson, null, 2));
-    } catch (e) {
+    } catch {
       console.error("Gemini API Error Raw:", errorBody);
     }
     throw new Error(`Gemini API failed: ${errorMessage}`);
@@ -67,9 +67,9 @@ export async function generateOutreachEmail(variables: {
     console.warn("Parsing failed, using fallback extraction", e);
     const lines = text.split('\n');
     let subject = "";
-    let bodyLines = [];
+    const bodyLines = [];
 
-    for (let line of lines) {
+    for (const line of lines) {
       if (line.toLowerCase().startsWith('subject:')) {
         subject = line.replace(/subject:/i, "").trim();
       } else {

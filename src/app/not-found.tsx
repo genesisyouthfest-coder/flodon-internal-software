@@ -1,39 +1,30 @@
 'use client'
 
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Home, ArrowLeft } from 'lucide-react'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-muted/20 flex flex-col items-center justify-center p-6 text-center">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
       <div className="space-y-6">
-        <div className="h-24 w-24 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground text-5xl font-bold mx-auto shadow-xl rotate-3">
-          F
+        <div className="space-y-2 border-b-2 border-foreground pb-6">
+          <h1 className="text-7xl md:text-9xl font-extrabold tracking-tighter uppercase">404</h1>
+          <h2 className="text-xl md:text-3xl font-bold uppercase tracking-widest text-foreground/80 pt-4">Target Not Found</h2>
         </div>
-        <div className="space-y-2">
-          <h1 className="text-7xl font-extrabold tracking-tighter">404</h1>
-          <h2 className="text-2xl font-bold">Page Not Found</h2>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Oops! The page you're looking for doesn't exist or has been moved to another department.
-          </p>
-        </div>
+        <p className="text-sm font-semibold tracking-widest uppercase pb-6 text-foreground/60 max-w-sm mx-auto">
+          The requested coordinate is missing from the system grid.
+        </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/dashboard">
-            <Button className="gap-2 px-8">
-              <Home className="h-4 w-4" />
-              Go to Dashboard
-            </Button>
+          <Link href="/dashboard" className="btn-solid px-8">
+            Return to Dashboard
           </Link>
-          <Button variant="ghost" onClick={() => typeof window !== 'undefined' && window.history.back()} className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
+          <button onClick={() => typeof window !== 'undefined' && window.history.back()} className="btn-outline px-8">
             Go Back
-          </Button>
+          </button>
         </div>
       </div>
       
-      <div className="mt-20 text-sm text-muted-foreground">
-        © {new Date().getFullYear()} Flodon AI Agency. Internal Systems.
+      <div className="mt-24 text-xs font-bold uppercase tracking-widest opacity-40">
+        © {new Date().getFullYear()} Flodon System
       </div>
     </div>
   )
