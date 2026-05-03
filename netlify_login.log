@@ -1,0 +1,16 @@
+Script started on 2026-05-03 13:40:42+05:30 [COMMAND="npx -y netlify login" <not executed on terminal>]
+Logging into your Netlify account...
+Opening https://app.netlify.com/authorize?response_type=ticket&ticket=db5a225678a084916b48946a5cfeda2c
+
+To request authorization from a human, run: netlify login --request "<msg>"
+
+⠋ Waiting for authorization...
+[1G
+You are now logged into your Netlify account!
+
+Run netlify status for account details
+
+To see all available commands run: netlify help
+
+
+Script done on 2026-05-03 13:40:52+05:30 [COMMAND_EXIT_CODE="0"]

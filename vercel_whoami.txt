@@ -1,0 +1,6 @@
+> No existing credentials found. Starting login flow...
+> 
+  Visit https://vercel.com/oauth/device?user_code=FMCR-CPRH
+
+Waiting for authentication...
+Error: The user aborted a request.
