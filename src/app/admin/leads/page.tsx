@@ -93,7 +93,7 @@ export default async function InboundLeadsPage() {
                   <div className="pt-4 mt-auto flex items-center justify-between border-t border-foreground/10">
                     <p className="text-[10px] font-bold opacity-40 uppercase">{date}</p>
                     <Link 
-                      href={`/dashboard/sales/clients/${lead.id}`}
+                      href={`/admin/clients/${lead.id}`}
                       className="text-[10px] font-black uppercase tracking-widest hover:underline"
                     >
                       View Details &rarr;
