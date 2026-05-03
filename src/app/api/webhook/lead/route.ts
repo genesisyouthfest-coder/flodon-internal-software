@@ -9,29 +9,55 @@ if (!WEBSITE_AGENT_ID) console.warn("⚠️ WEBSITE_AGENT_ID is not set. Lead in
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // Service role to bypass RLS
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+const ALLOWED_ORIGINS = ['https://flodon.in', 'http://localhost:3000', 'http://localhost:3001'];
+
+function getCorsHeaders(origin: string) {
+  const isAllowed = ALLOWED_ORIGINS.includes(origin);
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : ALLOWED_ORIGINS[0],
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400',
+  };
+}
+
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin') || '';
+  return new NextResponse(null, {
+    status: 204,
+    headers: getCorsHeaders(origin),
+  });
+}
+
 export async function POST(request: NextRequest) {
+  const origin = request.headers.get('origin') || '';
+  const corsHeaders = getCorsHeaders(origin);
+
   try {
     // 1. Bearer Token Auth
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${WEBHOOK_SECRET}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { 
+        status: 401,
+        headers: corsHeaders 
+      });
     }
 
     // 2. Origin/Referer Restriction (Security Lock)
     const referer = request.headers.get('referer') || '';
-    const origin = request.headers.get('origin') || '';
-    const allowedOrigins = ['https://flodon.in', 'http://localhost:3000', 'http://localhost:3001'];
-    
-    const isAllowed = allowedOrigins.some(allowed => 
+    const isOriginAllowed = ALLOWED_ORIGINS.some(allowed => 
       referer.startsWith(allowed) || origin.startsWith(allowed)
     );
 
     // Only enforce origin check in production
-    if (!isAllowed && process.env.NODE_ENV === 'production') {
-      return NextResponse.json({ error: 'Forbidden: Request origin not allowed' }, { status: 403 });
+    if (!isOriginAllowed && process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ error: 'Forbidden: Request origin not allowed' }, { 
+        status: 403,
+        headers: corsHeaders 
+      });
     }
 
     const payload = await request.json();
@@ -65,7 +91,10 @@ export async function POST(request: NextRequest) {
     } = payload;
 
     if (!name || !email) {
-      return NextResponse.json({ error: 'Name and email are required' }, { status: 400 });
+      return NextResponse.json({ error: 'Name and email are required' }, { 
+        status: 400,
+        headers: corsHeaders
+      });
     }
 
     // Check for duplicate
@@ -79,7 +108,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         message: 'Lead already exists', 
         leadId: existingLead.id 
-      }, { status: 200 });
+      }, { 
+        status: 200,
+        headers: corsHeaders
+      });
     }
 
     // Insert into clients
@@ -121,7 +153,10 @@ export async function POST(request: NextRequest) {
 
     if (leadError) {
       console.error('Lead insertion error:', leadError);
-      return NextResponse.json({ error: 'Database error' }, { status: 500 });
+      return NextResponse.json({ error: 'Database error' }, { 
+        status: 500,
+        headers: corsHeaders
+      });
     }
 
     // Insert into calls if booking exists
@@ -156,10 +191,16 @@ export async function POST(request: NextRequest) {
       success: true, 
       leadId: newLead.id,
       message: 'Lead created successfully'
-    }, { status: 201 });
+    }, { 
+      status: 201,
+      headers: corsHeaders
+    });
 
   } catch (error) {
     console.error('Webhook processing error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { 
+      status: 500,
+      headers: corsHeaders
+    });
   }
 }
