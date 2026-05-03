@@ -14,9 +14,24 @@ const supabase = createClient(
 
 export async function POST(request: NextRequest) {
   try {
+    // 1. Bearer Token Auth
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${WEBHOOK_SECRET}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // 2. Origin/Referer Restriction (Security Lock)
+    const referer = request.headers.get('referer') || '';
+    const origin = request.headers.get('origin') || '';
+    const allowedOrigins = ['https://flodon.in', 'http://localhost:3000', 'http://localhost:3001'];
+    
+    const isAllowed = allowedOrigins.some(allowed => 
+      referer.startsWith(allowed) || origin.startsWith(allowed)
+    );
+
+    // Only enforce origin check in production
+    if (!isAllowed && process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ error: 'Forbidden: Request origin not allowed' }, { status: 403 });
     }
 
     const payload = await request.json();
@@ -80,7 +95,7 @@ export async function POST(request: NextRequest) {
         added_by: WEBSITE_AGENT_ID,
         added_by_name: 'Website Lead Agent',
         lead_source: 'website',
-        source_url: request.headers.get('referer') || 'https://flodon.in',
+        source_url: referer || 'https://flodon.in',
         qualification: {
           website,
           businessDescription,
