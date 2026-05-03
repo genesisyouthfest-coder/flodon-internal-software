@@ -127,6 +127,7 @@ export async function POST(request: NextRequest) {
         added_by: WEBSITE_AGENT_ID,
         added_by_name: 'Website Lead Agent',
         lead_source: 'website',
+        service: offerings || 'Website Lead', // Map offerings to the required service column
         source_url: referer || 'https://flodon.in',
         qualification: {
           website,
