@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/utils/supabase/admin'
 import { notFound } from 'next/navigation'
 import BackButton from '@/components/BackButton'
-import { updateClientStage } from '@/app/dashboard/sales/actions' // Reuse the existing action
+import { updateClientStage } from '@/app/dashboard/sales/clients/actions' 
 import NotesEditor from '@/app/dashboard/sales/clients/[id]/NotesEditor'
 import DeleteClientButton from '@/app/dashboard/sales/clients/[id]/DeleteClientButton'
 
