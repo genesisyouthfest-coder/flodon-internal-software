@@ -32,8 +32,6 @@ export default async function InboundLeadsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {leads.map((lead) => {
-            const q = lead.qualification || {}
-            const isHot = q.readyToMoveForward === 'Yes' && q.investmentLevel
             const date = new Date(lead.created_at).toLocaleDateString('en-IN', {
                day: '2-digit',
                month: 'short',
@@ -42,20 +40,12 @@ export default async function InboundLeadsPage() {
 
             return (
               <div key={lead.id} className="card-solid p-0 flex flex-col group hover:border-foreground transition-all duration-300">
-                {/* Status Bar */}
-                <div className={`h-1.5 w-full ${isHot ? 'bg-green-500' : 'bg-foreground/20'}`} />
-                
                 <div className="p-6 flex-1 flex flex-col space-y-6">
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
                       <h2 className="text-xl font-black uppercase tracking-tighter leading-tight">{lead.name}</h2>
                       <p className="text-[10px] font-bold uppercase tracking-widest opacity-60">{lead.brand_name || 'Individual Entity'}</p>
                     </div>
-                    {isHot && (
-                      <span className="bg-green-500 text-black text-[9px] font-black uppercase px-2 py-1 tracking-tighter animate-pulse">
-                        Hot Lead
-                      </span>
-                    )}
                   </div>
 
                   <div className="space-y-3">

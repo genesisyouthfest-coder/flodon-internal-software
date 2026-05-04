@@ -1,6 +1,6 @@
 import { createAdminClient } from '@/utils/supabase/admin'
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 
 export default async function AdminClientDetailPage(props: {
   params: Promise<{ id: string }>
@@ -28,11 +28,9 @@ export default async function AdminClientDetailPage(props: {
     <div className="space-y-12 animate-in fade-in duration-700">
       <div className="flex flex-col gap-6 pb-6 border-b-2 border-foreground">
         <div className="flex items-center gap-4">
-          <Link href="/admin/clients" className="text-sm font-bold uppercase tracking-widest hover:underline">
-            &larr; Global Directory
-          </Link>
+          <BackButton />
           <div className="h-1 w-1 bg-foreground rounded-full" />
-          <p className="text-xs font-bold tracking-widest text-foreground/60 uppercase">Admin Control Panel</p>
+          <p className="text-xs font-bold tracking-widest text-foreground/60 uppercase">Lead Intelligence</p>
         </div>
         
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
