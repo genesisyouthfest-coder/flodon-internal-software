@@ -8,17 +8,40 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+const ALLOWED_ORIGINS = ['https://flodon.in', 'http://localhost:3000', 'http://localhost:3001'];
+
+function getCorsHeaders(origin: string) {
+  const isAllowed = ALLOWED_ORIGINS.includes(origin);
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : ALLOWED_ORIGINS[0],
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400',
+  };
+}
+
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin') || '';
+  return new NextResponse(null, {
+    status: 204,
+    headers: getCorsHeaders(origin),
+  });
+}
+
 export async function POST(request: NextRequest) {
+  const origin = request.headers.get('origin') || '';
+  const corsHeaders = getCorsHeaders(origin);
+
   try {
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${WEBHOOK_SECRET}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: corsHeaders });
     }
 
     const { email, slotId, reason } = await request.json();
 
     if (!email && !slotId) {
-      return NextResponse.json({ error: 'Email or slotId is required' }, { status: 400 });
+      return NextResponse.json({ error: 'Email or slotId is required' }, { status: 400, headers: corsHeaders });
     }
 
     // Find and update the call status to 'rejected'
@@ -34,7 +57,7 @@ export async function POST(request: NextRequest) {
       if (client) {
         query = query.eq('client_id', client.id).eq('status', 'booked');
       } else {
-        return NextResponse.json({ error: 'Client not found' }, { status: 404 });
+        return NextResponse.json({ error: 'Client not found' }, { status: 404, headers: corsHeaders });
       }
     }
 
@@ -42,14 +65,13 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Rejection error:', error);
-      return NextResponse.json({ error: 'Database error' }, { status: 500 });
+      return NextResponse.json({ error: 'Database error' }, { status: 500, headers: corsHeaders });
     }
 
     if (!data || data.length === 0) {
-      return NextResponse.json({ message: 'No active booking found to reject' }, { status: 404 });
+      return NextResponse.json({ message: 'No active booking found to reject' }, { status: 404, headers: corsHeaders });
     }
 
-    // Log the rejection activity
     await supabase.from('activity_log').insert({
       action: `Call rejected for ${data[0].prospect_name}`,
       entity_type: 'call',
@@ -57,10 +79,10 @@ export async function POST(request: NextRequest) {
       metadata: { reason }
     });
 
-    return NextResponse.json({ success: true, message: 'Call marked as rejected' }, { status: 200 });
+    return NextResponse.json({ success: true, message: 'Call marked as rejected' }, { status: 200, headers: corsHeaders });
 
   } catch (error) {
     console.error('Reject webhook error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500, headers: corsHeaders });
   }
 }
