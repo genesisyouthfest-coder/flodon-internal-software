@@ -69,12 +69,14 @@ export default async function AdminClientsPage(props: {
               </tr>
             ) : (
               clients.map((client: any) => (
-                <tr key={client.id} className="hover:bg-accent/50 transition-colors">
+                <tr key={client.id} className="hover:bg-foreground/5 transition-colors group cursor-pointer">
                   <td className="px-6 py-4">
-                    <p className="font-bold uppercase tracking-wide">{client.name}</p>
-                    <p className="text-xs text-foreground/60 font-semibold tracking-wider uppercase mt-1">
-                      {client.brand_name || 'Individual'}
-                    </p>
+                    <a href={`/admin/clients/${client.id}`} className="block group-hover:underline">
+                      <p className="font-bold uppercase tracking-wide">{client.name}</p>
+                      <p className="text-xs text-foreground/60 font-semibold tracking-wider uppercase mt-1">
+                        {client.brand_name || 'Individual'}
+                      </p>
+                    </a>
                   </td>
                   <td className="px-6 py-4 font-medium">
                     {client.email}
@@ -82,10 +84,16 @@ export default async function AdminClientsPage(props: {
                   <td className="px-6 py-4">
                     <p className="font-bold tracking-tight text-xs uppercase">{client.profiles?.full_name}</p>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 flex items-center justify-between gap-4">
                     <span className="inline-flex items-center justify-center px-3 py-1 text-[10px] font-bold uppercase tracking-widest border-2 border-foreground">
                       {client.pipeline_stage}
                     </span>
+                    <a 
+                      href={`/admin/clients/${client.id}`}
+                      className="text-[10px] font-black uppercase tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-opacity bg-foreground text-background px-3 py-1"
+                    >
+                      View &rarr;
+                    </a>
                   </td>
                 </tr>
               ))
