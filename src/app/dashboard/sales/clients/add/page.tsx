@@ -15,6 +15,8 @@ export default function AddClientPage() {
       toast.error(`REGISTRATION FAILURE: ${result.error}`)
     } else {
       toast.success('ENTITY REGISTERED IN SYSTEM GRID')
+      router.push('/dashboard/sales/clients')
+      router.refresh()
     }
   }
 
