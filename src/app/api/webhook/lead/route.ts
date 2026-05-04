@@ -89,55 +89,50 @@ export async function POST(request: NextRequest) {
       .eq('email', email)
       .single();
 
-    if (existingLead) {
-      return NextResponse.json({ 
-        message: 'Lead already exists', 
-        leadId: existingLead.id 
-      }, { 
-        status: 200,
-        headers: corsHeaders
-      });
-    }
+    let leadId = existingLead?.id;
 
-    // Insert into clients
-    const { data: newLead, error: leadError } = await supabase
-      .from('clients')
-      .insert({
-        name,
-        email,
-        phone: phone || null,
-        brand_name: website || null,
-        pipeline_stage: 'lead',
-        added_by: WEBSITE_AGENT_ID,
-        added_by_name: 'Website Lead Agent',
-        lead_source: 'website',
-        service: businessDescription ? businessDescription.substring(0, 50) : 'Website Lead',
-        source_url: referer || 'https://flodon.in',
-        qualification: {
-          website,
-          businessDescription,
-          monthlyRevenue,
-          currentLeadSources,
-          biggestBottleneck,
-          goal90Days,
-          investmentLevel,
-          readyToImplement,
-          decisionMaker
-        }
-      })
-      .select()
-      .single();
+    if (!leadId) {
+      // Insert into clients
+      const { data: newLead, error: leadError } = await supabase
+        .from('clients')
+        .insert({
+          name,
+          email,
+          phone: phone || null,
+          brand_name: website || null,
+          pipeline_stage: 'lead',
+          added_by: WEBSITE_AGENT_ID,
+          added_by_name: 'Website Lead Agent',
+          lead_source: 'website',
+          service: businessDescription ? businessDescription.substring(0, 50) : 'Website Lead',
+          source_url: referer || 'https://flodon.in',
+          qualification: {
+            website,
+            businessDescription,
+            monthlyRevenue,
+            currentLeadSources,
+            biggestBottleneck,
+            goal90Days,
+            investmentLevel,
+            readyToImplement,
+            decisionMaker
+          }
+        })
+        .select()
+        .single();
 
-    if (leadError) {
-      console.error('Lead insertion error:', leadError);
-      return NextResponse.json({ error: 'Database error' }, { 
-        status: 500,
-        headers: corsHeaders
-      });
+      if (leadError) {
+        console.error('Lead insertion error:', leadError);
+        return NextResponse.json({ error: 'Database error' }, { 
+          status: 500,
+          headers: corsHeaders
+        });
+      }
+      leadId = newLead.id;
     }
 
     // Insert into calls if booking exists
-    if (date && startTime) {
+    if (date && startTime && leadId) {
       const scheduledAt = new Date(`${date}T${startTime}`).toISOString();
       const { error: callError } = await supabase
         .from('calls')
