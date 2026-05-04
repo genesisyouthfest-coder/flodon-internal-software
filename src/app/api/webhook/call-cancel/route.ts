@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the call
-    let query = supabase.from('calls').update({ status: 'canceled', outcome: reason || 'Canceled by user' });
+    let query = supabase.from('calls').update({ status: 'cancelled', outcome: reason || 'Canceled by user' });
     
     if (slotId) {
       query = query.eq('slot_id', slotId);
