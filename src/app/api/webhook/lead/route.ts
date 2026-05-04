@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
       const { error: callError } = await supabase
         .from('calls')
         .insert({
-          client_id: newLead.id,
+          client_id: leadId,
           prospect_name: name,
           company: website || 'Website Lead',
           scheduled_at: scheduledAt,
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
       user_id: WEBSITE_AGENT_ID,
       action: `Lead created via website: ${name}`,
       entity_type: 'client',
-      entity_id: newLead.id
+      entity_id: leadId
     });
 
     return NextResponse.json({ 
