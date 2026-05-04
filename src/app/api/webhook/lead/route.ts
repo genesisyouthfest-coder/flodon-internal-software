@@ -4,9 +4,6 @@ import { createClient } from '@supabase/supabase-js';
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
 const WEBSITE_AGENT_ID = process.env.WEBSITE_AGENT_ID;
 
-if (!WEBHOOK_SECRET) console.warn("⚠️ WEBHOOK_SECRET is not set. Webhook will reject all requests.");
-if (!WEBSITE_AGENT_ID) console.warn("⚠️ WEBSITE_AGENT_ID is not set. Lead insertion may fail RLS or FK constraints.");
-
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -46,13 +43,12 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 2. Origin/Referer Restriction (Security Lock)
+    // 2. Origin/Referer Restriction
     const referer = request.headers.get('referer') || '';
     const isOriginAllowed = ALLOWED_ORIGINS.some(allowed => 
       referer.startsWith(allowed) || origin.startsWith(allowed)
     );
 
-    // Only enforce origin check in production
     if (!isOriginAllowed && process.env.NODE_ENV === 'production') {
       return NextResponse.json({ error: 'Forbidden: Request origin not allowed' }, { 
         status: 403,
@@ -65,26 +61,15 @@ export async function POST(request: NextRequest) {
       name,
       email,
       phone,
-      companyName,
       website,
       businessDescription,
-      targetAudience,
-      offerings,
       monthlyRevenue,
-      averageDealSize,
       currentLeadSources,
-      monthlyLeads,
-      usingAI,
       biggestBottleneck,
-      triedToFix,
       goal90Days,
-      whyNow,
-      readyToImplement,
       investmentLevel,
+      readyToImplement,
       decisionMaker,
-      readyToMoveForward,
-      anythingElse,
-      slotId,
       date,
       startTime,
       endTime
@@ -121,32 +106,23 @@ export async function POST(request: NextRequest) {
         name,
         email,
         phone: phone || null,
-        brand_name: companyName || null,
-        notes: anythingElse || null,
+        brand_name: website || null,
         pipeline_stage: 'lead',
         added_by: WEBSITE_AGENT_ID,
         added_by_name: 'Website Lead Agent',
         lead_source: 'website',
-        service: offerings || 'Website Lead', // Map offerings to the required service column
+        service: businessDescription ? businessDescription.substring(0, 50) : 'Website Lead',
         source_url: referer || 'https://flodon.in',
         qualification: {
           website,
           businessDescription,
-          targetAudience,
-          offerings,
           monthlyRevenue,
-          averageDealSize,
           currentLeadSources,
-          monthlyLeads,
-          usingAI,
           biggestBottleneck,
-          triedToFix,
           goal90Days,
-          whyNow,
-          readyToImplement,
           investmentLevel,
-          decisionMaker,
-          readyToMoveForward
+          readyToImplement,
+          decisionMaker
         }
       })
       .select()
@@ -168,9 +144,8 @@ export async function POST(request: NextRequest) {
         .insert({
           client_id: newLead.id,
           prospect_name: name,
-          company: companyName,
+          company: website || 'Website Lead',
           scheduled_at: scheduledAt,
-          slot_id: slotId,
           source: 'website',
           status: 'booked'
         });
