@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ 
       success: true, 
-      leadId: newLead.id,
+      leadId: leadId,
       message: 'Lead created successfully'
     }, { 
       status: 201,
