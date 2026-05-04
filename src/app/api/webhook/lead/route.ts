@@ -147,6 +147,13 @@ export async function POST(request: NextRequest) {
 
       if (callError) {
         console.error('Call insertion error:', callError);
+        return NextResponse.json({ 
+          error: 'Booking creation failed', 
+          details: callError.message 
+        }, { 
+          status: 500,
+          headers: corsHeaders
+        });
       }
     }
 
