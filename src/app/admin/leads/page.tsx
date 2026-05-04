@@ -11,7 +11,7 @@ export default async function InboundLeadsPage() {
 
   const { data: leads } = await supabase
     .from('clients')
-    .select('*')
+    .select('*, calls(*)')
     .eq('lead_source', 'website')
     .order('created_at', { ascending: false })
 
@@ -31,8 +31,9 @@ export default async function InboundLeadsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {leads.map((lead) => {
+          {leads.map((lead: any) => {
             const q = lead.qualification || {}
+            const latestCall = lead.calls?.length > 0 ? lead.calls[0] : null
             const date = new Date(lead.created_at).toLocaleDateString('en-IN', {
                day: '2-digit',
                month: 'short',
@@ -47,6 +48,22 @@ export default async function InboundLeadsPage() {
                       <h2 className="text-xl font-black uppercase tracking-tighter leading-tight">{lead.name}</h2>
                       <p className="text-[10px] font-bold uppercase tracking-widest opacity-60">{lead.brand_name || 'Individual Entity'}</p>
                     </div>
+                    {/* Call Status Badges */}
+                    {latestCall?.status === 'cancelled' && (
+                      <span className="bg-red-600 text-white text-[9px] font-black uppercase px-2 py-1 tracking-tighter">
+                        Call Cancelled
+                      </span>
+                    )}
+                    {latestCall?.status === 'rejected' && (
+                      <span className="bg-orange-600 text-white text-[9px] font-black uppercase px-2 py-1 tracking-tighter">
+                        Call Rejected
+                      </span>
+                    )}
+                    {latestCall?.status === 'booked' && (
+                      <span className="bg-blue-600 text-white text-[9px] font-black uppercase px-2 py-1 tracking-tighter">
+                        Booked: {new Date(latestCall.scheduled_at).toLocaleDateString()}
+                      </span>
+                    )}
                   </div>
 
                   <div className="space-y-3">
