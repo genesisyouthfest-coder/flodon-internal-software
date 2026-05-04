@@ -32,6 +32,7 @@ export default async function InboundLeadsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {leads.map((lead) => {
+            const q = lead.qualification || {}
             const date = new Date(lead.created_at).toLocaleDateString('en-IN', {
                day: '2-digit',
                month: 'short',
